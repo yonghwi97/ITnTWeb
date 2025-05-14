@@ -1,10 +1,14 @@
 const express = require('express');
 const path = require('path');
-const { Pool } = require('pg'); // 추가
-require('dotenv').config(); // 환경변수 읽기
+const { Pool } = require('pg');
+require('dotenv').config();
 
 const app = express();
+
+// 폼 데이터 읽기 미들웨어 추가
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(express.static('public'));
 
 // PostgreSQL 연결
