@@ -4,84 +4,94 @@
     <meta charset="UTF-8">
     <title>SV3 SW 이름 공모전</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f2f2f2;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 40px;
-            padding: 40px;
-            margin: 0;
-        }
-        .form-container, .vote-container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 400px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            color: #555;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        button {
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        .submit-btn:hover {
-            background-color: #45a049;
-        }
-        .vote-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        .vote-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-            color: #333;
-        }
-        .vote-button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            line-height: 1;
-            color: #4CAF50;
-        }
-        .vote-button:hover {
-            color: #45a049;
-        }
+		body {
+			font-family: 'Noto Sans KR', sans-serif;
+			background-color: #eef1f5;
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			gap: 40px;
+			padding: 50px;
+			margin: 0;
+		}
+		.form-container, .vote-container {
+			background: white;
+			padding: 30px 40px;
+			border-radius: 16px;
+			box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+			width: 420px;
+		}
+		h1 {
+			text-align: center;
+			color: #222;
+			font-size: 24px;
+			margin-bottom: 20px;
+		}
+		label {
+			display: block;
+			margin-bottom: 6px;
+			font-weight: bold;
+			color: #555;
+			margin-top: 10px;
+		}
+		input, textarea {
+			width: 100%;
+			padding: 12px;
+			margin-bottom: 18px;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			font-size: 15px;
+			box-sizing: border-box;
+			background-color: #fafafa;
+		}
+		.submit-btn {
+			width: 100%;
+			padding: 14px;
+			background-color: #5c7cfa;
+			color: white;
+			border: none;
+			border-radius: 8px;
+			font-size: 16px;
+			font-weight: bold;
+			transition: background-color 0.3s ease;
+			margin-top: 10px;
+		}
+		.submit-btn:hover {
+			background-color: #4c6ef5;
+		}
+		.vote-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background: #f8f9fa;
+			padding: 10px 15px;
+			border-radius: 8px;
+			margin-bottom: 10px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+		}
+		.vote-info {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			font-size: 16px;
+			color: #333;
+		}
+		.vote-rank {
+			font-weight: bold;
+			font-size: 18px;
+			color: #5c7cfa;
+			margin-right: 10px;
+		}
+		.vote-button {
+			background: none;
+			border: none;
+			font-size: 26px;
+			color: #5c7cfa;
+			cursor: pointer;
+		}
+		.vote-button:hover {
+			color: #4c6ef5;
+		}
     </style>
 </head>
 <body>
@@ -188,13 +198,20 @@
 	function renderVotes(votes) {
 		voteList.innerHTML = '';
 		votes.sort((a, b) => b.vote_count - a.vote_count);
-		votes.forEach(item => {
+	
+		votes.forEach((item, index) => {
 			const div = document.createElement('div');
 			div.className = 'vote-item';
 	
 			const info = document.createElement('div');
 			info.className = 'vote-info';
-			info.innerHTML = `<strong>${item.suggested_name}</strong> (${item.vote_count}표)`;
+			info.innerHTML = `
+				<div>
+					<span class="vote-rank">${index + 1}등</span> 
+					<strong>${item.suggested_name}</strong>
+				</div>
+				<div>${item.vote_count}표</div>
+			`;
 	
 			const button = document.createElement('button');
 			button.className = 'vote-button';
@@ -206,6 +223,7 @@
 			voteList.appendChild(div);
 		});
 	}
+
 	
 	// 팝업 표시
 	function showPopup(message) {
