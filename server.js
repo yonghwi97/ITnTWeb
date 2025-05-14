@@ -39,7 +39,19 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/names', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT suggested_name FROM submissions');
+        const names = result.rows.map(row => row.suggested_name);
+        res.json(names);
+    } catch (err) {
+        console.error('DB 이름 조회 오류:', err);
+        res.status(500).send('서버 오류');
+    }
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`서버 실행 중! 포트: ${port}`);
 });
+
