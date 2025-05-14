@@ -171,7 +171,7 @@
 	}
 	
 	// 투표 버튼 눌렀을 때
-	async function vote(name) {
+	async function vote(suggestedName) {
 		const employeeId = prompt('사번을 입력하세요:');
 		const userName = prompt('이름을 입력하세요:');
 		if (!employeeId || !userName) {
@@ -185,20 +185,22 @@
 				body: JSON.stringify({
 					employeeId: employeeId,
 					userName: userName,
-					suggestedName: name
+					suggestedName: suggestedName
 				})
 			});
 			if (response.ok) {
-				showPopup(`✅ ${name}에 투표 완료!`);
-				await fetchNames();
+				showPopup(`✅ ${suggestedName}에 투표 완료!`);
+				await fetchNames(); // 목록 새로고침
 			} else {
-				showPopup('❗️ 투표 실패. 다시 시도하세요.');
+				const errorMessage = await response.text();
+				showPopup('❗️ ' + errorMessage);
 			}
 		} catch (error) {
 			console.error('투표 에러:', error);
 			showPopup('❗️ 서버 오류 발생');
 		}
 	}
+
 	
 	// 이름 목록 화면에 표시
 	function renderVotes(votes) {
