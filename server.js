@@ -5,26 +5,32 @@ require('dotenv').config();
 
 const app = express();
 
-// 폼 데이터 읽기 미들웨어 추가
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 app.use(express.static('public'));
 
-// PostgreSQL 연결
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // SSL 연결 (Neon은 SSL 필요)
-  },
+  ssl: { rejectUnauthorized: false },
 });
 
-// POST 요청 처리
+// 이름 + 투표수 가져오기
+app.get('/names', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT suggested_name, vote_count FROM submissions');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('DB 이름 조회 오류:', err);
+        res.status(500).send('서버 오류');
+    }
+});
+
+// 새로운 이름 제출
 app.post('/submit', async (req, res) => {
     const { employeeId, name, suggestedName, reason } = req.body;
     try {
         await pool.query(
-            'INSERT INTO submissions (employee_id, name, suggested_name, reason) VALUES ($1, $2, $3, $4)',
+            'INSERT INTO submissions (employee_id, name, suggested_name, reason, vote_count) VALUES ($1, $2, $3, $4, 0)',
             [employeeId, name, suggestedName, reason]
         );
         res.send('제출 완료!');
@@ -34,24 +40,27 @@ app.post('/submit', async (req, res) => {
     }
 });
 
-// 기본 루트
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/names', async (req, res) => {
+// 투표하기
+app.post('/vote', async (req, res) => {
+    const { suggestedName } = req.body;
     try {
-        const result = await pool.query('SELECT suggested_name FROM submissions');
-        const names = result.rows.map(row => row.suggested_name);
-        res.json(names);
+        await pool.query(
+            'UPDATE submissions SET vote_count = vote_count + 1 WHERE suggested_name = $1',
+            [suggestedName]
+        );
+        res.send('투표 완료!');
     } catch (err) {
-        console.error('DB 이름 조회 오류:', err);
+        console.error('투표 업데이트 오류:', err);
         res.status(500).send('서버 오류');
     }
+});
+
+// 메인 페이지
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`서버 실행 중! 포트: ${port}`);
 });
-

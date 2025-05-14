@@ -112,126 +112,140 @@
         </form>
     </div>
 
-    <script>
-		const form = document.getElementById('submissionForm');
-		const voteList = document.getElementById('voteList');
-		let votes = [];
-		
-		form.addEventListener('submit', async function(event) {
-			event.preventDefault();
-		
-			const employeeId = document.getElementById('employeeId').value.trim();
-			const name = document.getElementById('name').value.trim();
-			const suggestedName = document.getElementById('suggestedName').value.trim();
-			const reason = document.getElementById('reason').value.trim();
-		
-			const data = { employeeId, name, suggestedName, reason };
-		
-			try {
-				const response = await fetch('/submit', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(data)
-				});
-		
-				if (response.ok) {
-					showPopup('🎉 제출 완료! 감사합니다!');
-					form.reset();
-					await fetchNames(); // 제출하고 바로 목록 업데이트
-				} else {
-					showPopup('❗️ 제출 실패. 다시 시도하세요.');
-				}
-			} catch (error) {
-				console.error('에러:', error);
-				showPopup('❗️ 서버 오류 발생');
-			}
-		});
-		
-		// ✅ 10초마다 서버에서 이름 목록 갱신하는 함수
-		async function fetchNames() {
-			try {
-				const response = await fetch('/names');
-				const names = await response.json();
-				names.forEach(name => {
-					if (!votes.find(v => v.name === name)) {
-						votes.push({ name: name, count: 0 });
-					}
-				});
-				renderVotes();
-			} catch (error) {
-				console.error('이름 가져오기 에러:', error);
-			}
-		}
-		
-		function renderVotes() {
-			voteList.innerHTML = '';
-			votes.sort((a, b) => b.count - a.count);
-			votes.forEach(item => {
-				const div = document.createElement('div');
-				div.className = 'vote-item';
-		
-				const info = document.createElement('div');
-				info.className = 'vote-info';
-				info.innerHTML = `<strong>${item.name}</strong> (${item.count}표)`;
-		
-				const button = document.createElement('button');
-				button.className = 'vote-button';
-				button.innerHTML = '👍';
-				button.onclick = () => {
-					const employeeId = prompt('사번을 입력하세요:');
-					const userName = prompt('이름을 입력하세요:');
-					if (!employeeId || !userName) {
-						showPopup('❗️ 사번과 이름을 입력해야 투표할 수 있습니다.');
-						return;
-					}
-					item.count++;
-					renderVotes();
-					showPopup(`✅ ${item.name}에 투표 완료!`);
-				};
-		
-				div.appendChild(info);
-				div.appendChild(button);
-				voteList.appendChild(div);
+
+	<script>
+	const form = document.getElementById('submissionForm');
+	const voteList = document.getElementById('voteList');
+	
+	form.addEventListener('submit', async function(event) {
+		event.preventDefault();
+	
+		const employeeId = document.getElementById('employeeId').value.trim();
+		const name = document.getElementById('name').value.trim();
+		const suggestedName = document.getElementById('suggestedName').value.trim();
+		const reason = document.getElementById('reason').value.trim();
+	
+		const data = { employeeId, name, suggestedName, reason };
+	
+		try {
+			const response = await fetch('/submit', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(data)
 			});
+	
+			if (response.ok) {
+				showPopup('🎉 제출 완료! 감사합니다!');
+				form.reset();
+				await fetchNames();
+			} else {
+				showPopup('❗️ 제출 실패. 다시 시도하세요.');
+			}
+		} catch (error) {
+			console.error('에러:', error);
+			showPopup('❗️ 서버 오류 발생');
 		}
-		
-		function showPopup(message) {
-			const popup = document.createElement('div');
-			popup.textContent = message;
-			popup.style.position = 'fixed';
-			popup.style.top = '50%';
-			popup.style.left = '50%';
-			popup.style.transform = 'translate(-50%, -50%)';
-			popup.style.background = '#333';
-			popup.style.color = 'white';
-			popup.style.padding = '20px 40px';
-			popup.style.borderRadius = '12px';
-			popup.style.fontSize = '18px';
-			popup.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
+	});
+	
+	// 이름 + 투표수 가져오기
+	async function fetchNames() {
+		try {
+			const response = await fetch('/names');
+			const names = await response.json();
+			renderVotes(names);
+		} catch (error) {
+			console.error('이름 가져오기 에러:', error);
+		}
+	}
+	
+	// 투표 버튼 눌렀을 때
+	async function vote(name) {
+		const employeeId = prompt('사번을 입력하세요:');
+		const userName = prompt('이름을 입력하세요:');
+		if (!employeeId || !userName) {
+			showPopup('❗️ 사번과 이름을 입력해야 투표할 수 있습니다.');
+			return;
+		}
+		try {
+			const response = await fetch('/vote', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ suggestedName: name })
+			});
+			if (response.ok) {
+				showPopup(`✅ ${name}에 투표 완료!`);
+				await fetchNames();
+			} else {
+				showPopup('❗️ 투표 실패. 다시 시도하세요.');
+			}
+		} catch (error) {
+			console.error('투표 에러:', error);
+			showPopup('❗️ 서버 오류 발생');
+		}
+	}
+	
+	// 이름 목록 화면에 표시
+	function renderVotes(votes) {
+		voteList.innerHTML = '';
+		votes.sort((a, b) => b.vote_count - a.vote_count);
+		votes.forEach(item => {
+			const div = document.createElement('div');
+			div.className = 'vote-item';
+	
+			const info = document.createElement('div');
+			info.className = 'vote-info';
+			info.innerHTML = `<strong>${item.suggested_name}</strong> (${item.vote_count}표)`;
+	
+			const button = document.createElement('button');
+			button.className = 'vote-button';
+			button.innerHTML = '👍';
+			button.onclick = () => vote(item.suggested_name);
+	
+			div.appendChild(info);
+			div.appendChild(button);
+			voteList.appendChild(div);
+		});
+	}
+	
+	// 팝업 표시
+	function showPopup(message) {
+		const popup = document.createElement('div');
+		popup.textContent = message;
+		popup.style.position = 'fixed';
+		popup.style.top = '50%';
+		popup.style.left = '50%';
+		popup.style.transform = 'translate(-50%, -50%)';
+		popup.style.background = '#333';
+		popup.style.color = 'white';
+		popup.style.padding = '20px 40px';
+		popup.style.borderRadius = '12px';
+		popup.style.fontSize = '18px';
+		popup.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
+		popup.style.opacity = '0';
+		popup.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+		document.body.appendChild(popup);
+	
+		setTimeout(() => {
+			popup.style.opacity = '1';
+			popup.style.transform = 'translate(-50%, -50%) scale(1.05)';
+		}, 10);
+	
+		setTimeout(() => {
 			popup.style.opacity = '0';
-			popup.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-			document.body.appendChild(popup);
-		
+			popup.style.transform = 'translate(-50%, -50%) scale(0.9)';
 			setTimeout(() => {
-				popup.style.opacity = '1';
-				popup.style.transform = 'translate(-50%, -50%) scale(1.05)';
-			}, 10);
-		
-			setTimeout(() => {
-				popup.style.opacity = '0';
-				popup.style.transform = 'translate(-50%, -50%) scale(0.9)';
-				setTimeout(() => {
-					popup.remove();
-				}, 500);
-			}, 2000);
-		}
-		
-		
-		fetchNames();
-		
-		
-		setInterval(fetchNames, 10000);
-    </script>
+				popup.remove();
+			}, 500);
+		}, 2000);
+	}
+	
+	// 페이지 처음 로딩할 때
+	fetchNames();
+	
+	// 10초마다 최신 데이터 가져오기
+	setInterval(fetchNames, 10000);
+	</script>
+
 
 </body>
 </html>
