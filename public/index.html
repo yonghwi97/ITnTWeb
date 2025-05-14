@@ -42,6 +42,10 @@
             box-sizing: border-box;
         }
         button {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn {
             width: 100%;
             padding: 12px;
             background-color: #4CAF50;
@@ -49,10 +53,8 @@
             border: none;
             border-radius: 6px;
             font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-        button:hover {
+        .submit-btn:hover {
             background-color: #45a049;
         }
         .vote-item {
@@ -60,12 +62,25 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
-            border-bottom: 1px solid #eee;
             padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
         }
-        .vote-item span {
+        .vote-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 16px;
             color: #333;
+        }
+        .vote-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            color: #4CAF50;
+        }
+        .vote-button:hover {
+            color: #45a049;
         }
     </style>
 </head>
@@ -93,13 +108,14 @@
             <label for="reason">사유</label>
             <textarea id="reason" name="reason" rows="4" required></textarea>
 
-            <button type="submit">제출하기</button>
+            <button type="submit" class="submit-btn">제출하기</button>
         </form>
     </div>
 
     <script>
         const form = document.getElementById('submissionForm');
         const voteList = document.getElementById('voteList');
+        let votes = [];
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -119,40 +135,49 @@
                 });
 
                 if (response.ok) {
-                    addVoteItem(suggestedName);
-                    showPopup('제출 완료! 감사합니다!');
+                    votes.push({ name: suggestedName, count: 0 });
+                    renderVotes();
+                    showPopup('🎉 제출 완료! 감사합니다!');
                     form.reset();
                 } else {
-                    showPopup('제출 실패. 다시 시도하세요.');
+                    showPopup('❗️ 제출 실패. 다시 시도하세요.');
                 }
             } catch (error) {
                 console.error('에러:', error);
-                showPopup('서버 오류 발생');
+                showPopup('❗️ 서버 오류 발생');
             }
         });
 
-        function addVoteItem(name) {
-            const item = document.createElement('div');
-            item.className = 'vote-item';
+        function renderVotes() {
+            voteList.innerHTML = '';
+            votes.sort((a, b) => b.count - a.count);
+            votes.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'vote-item';
 
-            const span = document.createElement('span');
-            span.textContent = name;
+                const info = document.createElement('div');
+                info.className = 'vote-info';
+                info.innerHTML = `<strong>${item.name}</strong> (${item.count}표)`;
 
-            const voteButton = document.createElement('button');
-            voteButton.textContent = '투표';
-            voteButton.onclick = () => {
-                const employeeId = prompt('사번을 입력하세요:');
-                const userName = prompt('이름을 입력하세요:');
-                if (!employeeId || !userName) {
-                    showPopup('❗️ 사번과 이름을 입력해야 투표할 수 있습니다.');
-                    return;
-                }
-                showPopup(`${name}에 투표 완료!`);
-            };
+                const button = document.createElement('button');
+                button.className = 'vote-button';
+                button.innerHTML = '👍';
+                button.onclick = () => {
+                    const employeeId = prompt('사번을 입력하세요:');
+                    const userName = prompt('이름을 입력하세요:');
+                    if (!employeeId || !userName) {
+                        showPopup('❗️ 사번과 이름을 입력해야 투표할 수 있습니다.');
+                        return;
+                    }
+                    item.count++;
+                    renderVotes();
+                    showPopup(`✅ ${item.name}에 투표 완료!`);
+                };
 
-            item.appendChild(span);
-            item.appendChild(voteButton);
-            voteList.appendChild(item);
+                div.appendChild(info);
+                div.appendChild(button);
+                voteList.appendChild(div);
+            });
         }
 
         function showPopup(message) {
@@ -186,5 +211,6 @@
             }, 2000);
         }
     </script>
+
 </body>
 </html>
