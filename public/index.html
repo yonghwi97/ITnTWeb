@@ -2,29 +2,29 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>이름 공모 페이지</title>
+    <title>SV3 SW 이름 공모전</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f2f2f2;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;
+            gap: 40px;
+            padding: 40px;
             margin: 0;
         }
-        .form-container {
+        .form-container, .vote-container {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
+            width: 400px;
         }
         h1 {
             text-align: center;
-            margin-bottom: 24px;
             color: #333;
+            margin-bottom: 20px;
         }
         label {
             display: block;
@@ -35,7 +35,7 @@
         input, textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom: 18px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 14px;
@@ -55,12 +55,32 @@
         button:hover {
             background-color: #45a049;
         }
+        .vote-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        .vote-item span {
+            font-size: 16px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
+
+    <div class="vote-container">
+        <h1>투표 목록</h1>
+        <div id="voteList">
+            <!-- SW 이름과 투표 버튼이 추가될 부분 -->
+        </div>
+    </div>
+
     <div class="form-container">
-        <h1>SV3 SW 이름 공모전</h1>
-        <form action="/submit" method="post">
+        <h1>이름 공모</h1>
+        <form id="submissionForm">
             <label for="employeeId">사번</label>
             <input type="text" id="employeeId" name="employeeId" required>
 
@@ -78,17 +98,18 @@
     </div>
 
     <script>
-        const form = document.querySelector('form');
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault(); // 기본 제출 막기
+        const form = document.getElementById('submissionForm');
+        const voteList = document.getElementById('voteList');
 
-            const formData = new FormData(form);
-            const data = {
-                employeeId: formData.get('employeeId'),
-                name: formData.get('name'),
-                suggestedName: formData.get('suggestedName'),
-                reason: formData.get('reason')
-            };
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const employeeId = document.getElementById('employeeId').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const suggestedName = document.getElementById('suggestedName').value.trim();
+            const reason = document.getElementById('reason').value.trim();
+
+            const data = { employeeId, name, suggestedName, reason };
 
             try {
                 const response = await fetch('/submit', {
@@ -98,29 +119,54 @@
                 });
 
                 if (response.ok) {
-                    showSuccessMessage();
-                    form.reset(); // 폼 초기화
+                    addVoteItem(suggestedName);
+                    showPopup('제출 완료! 감사합니다!');
+                    form.reset();
                 } else {
-                    alert('제출 실패했습니다. 다시 시도해주세요.');
+                    showPopup('제출 실패. 다시 시도하세요.');
                 }
             } catch (error) {
                 console.error('에러:', error);
-                alert('서버 오류가 발생했습니다.');
+                showPopup('서버 오류 발생');
             }
         });
 
-        function showSuccessMessage() {
+        function addVoteItem(name) {
+            const item = document.createElement('div');
+            item.className = 'vote-item';
+
+            const span = document.createElement('span');
+            span.textContent = name;
+
+            const voteButton = document.createElement('button');
+            voteButton.textContent = '투표';
+            voteButton.onclick = () => {
+                const employeeId = prompt('사번을 입력하세요:');
+                const userName = prompt('이름을 입력하세요:');
+                if (!employeeId || !userName) {
+                    showPopup('❗️ 사번과 이름을 입력해야 투표할 수 있습니다.');
+                    return;
+                }
+                showPopup(`${name}에 투표 완료!`);
+            };
+
+            item.appendChild(span);
+            item.appendChild(voteButton);
+            voteList.appendChild(item);
+        }
+
+        function showPopup(message) {
             const popup = document.createElement('div');
-            popup.textContent = '🎉 제출 완료! 감사합니다!';
+            popup.textContent = message;
             popup.style.position = 'fixed';
             popup.style.top = '50%';
             popup.style.left = '50%';
             popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.background = '#4CAF50';
+            popup.style.background = '#333';
             popup.style.color = 'white';
             popup.style.padding = '20px 40px';
             popup.style.borderRadius = '12px';
-            popup.style.fontSize = '20px';
+            popup.style.fontSize = '18px';
             popup.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
             popup.style.opacity = '0';
             popup.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
@@ -140,9 +186,5 @@
             }, 2000);
         }
     </script>
-
-</body>
-</html>
-
 </body>
 </html>
