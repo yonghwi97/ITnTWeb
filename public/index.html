@@ -76,5 +76,73 @@
             <button type="submit">제출하기</button>
         </form>
     </div>
+
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); // 기본 제출 막기
+
+            const formData = new FormData(form);
+            const data = {
+                employeeId: formData.get('employeeId'),
+                name: formData.get('name'),
+                suggestedName: formData.get('suggestedName'),
+                reason: formData.get('reason')
+            };
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showSuccessMessage();
+                    form.reset(); // 폼 초기화
+                } else {
+                    alert('제출 실패했습니다. 다시 시도해주세요.');
+                }
+            } catch (error) {
+                console.error('에러:', error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        });
+
+        function showSuccessMessage() {
+            const popup = document.createElement('div');
+            popup.textContent = '🎉 제출 완료! 감사합니다!';
+            popup.style.position = 'fixed';
+            popup.style.top = '50%';
+            popup.style.left = '50%';
+            popup.style.transform = 'translate(-50%, -50%)';
+            popup.style.background = '#4CAF50';
+            popup.style.color = 'white';
+            popup.style.padding = '20px 40px';
+            popup.style.borderRadius = '12px';
+            popup.style.fontSize = '20px';
+            popup.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
+            popup.style.opacity = '0';
+            popup.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                popup.style.opacity = '1';
+                popup.style.transform = 'translate(-50%, -50%) scale(1.05)';
+            }, 10);
+
+            setTimeout(() => {
+                popup.style.opacity = '0';
+                popup.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                setTimeout(() => {
+                    popup.remove();
+                }, 500);
+            }, 2000);
+        }
+    </script>
+
+</body>
+</html>
+
 </body>
 </html>
