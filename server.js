@@ -42,18 +42,45 @@ app.post('/submit', async (req, res) => {
 
 // 투표하기
 app.post('/vote', async (req, res) => {
-    const { suggestedName } = req.body;
+    const { employeeId, userName, suggestedName } = req.body;
+
     try {
+        // 1. 사번과 이름으로 등록 여부 확인
+        const checkEmployee = await pool.query(
+            'SELECT * FROM employees WHERE employee_id = $1 AND name = $2',
+            [employeeId, userName]
+        );
+
+        if (checkEmployee.rows.length === 0) {
+            return res.status(400).send('등록되지 않은 사원입니다.');
+        }
+
+        const employee = checkEmployee.rows[0];
+
+        // 2. 이미 투표했는지 확인
+        if (employee.has_voted) {
+            return res.status(400).send('이미 투표하셨습니다.');
+        }
+
+        // 3. 투표수 +1
         await pool.query(
             'UPDATE submissions SET vote_count = vote_count + 1 WHERE suggested_name = $1',
             [suggestedName]
         );
+
+        // 4. 투표 완료 처리
+        await pool.query(
+            'UPDATE employees SET has_voted = TRUE WHERE employee_id = $1',
+            [employeeId]
+        );
+
         res.send('투표 완료!');
     } catch (err) {
-        console.error('투표 업데이트 오류:', err);
+        console.error('투표 처리 오류:', err);
         res.status(500).send('서버 오류');
     }
 });
+
 
 // 메인 페이지
 app.get('/', (req, res) => {

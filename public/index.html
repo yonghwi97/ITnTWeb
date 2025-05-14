@@ -182,7 +182,11 @@
 			const response = await fetch('/vote', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ suggestedName: name })
+				body: JSON.stringify({
+					employeeId: employeeId,
+					userName: userName,
+					suggestedName: name
+				})
 			});
 			if (response.ok) {
 				showPopup(`✅ ${name}에 투표 완료!`);
