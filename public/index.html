@@ -189,6 +189,19 @@
           hideTooltip();
           removeBlur();
         });
+		div.addEventListener('mouseenter', (e) => {
+			if (e.target === div) {
+				showTooltip(div.getAttribute('data-suggested-name'), div.getAttribute('data-reason'));
+				applyBlur();
+			}
+			});
+			
+			div.addEventListener('mouseleave', (e) => {
+			if (e.target === div) {
+				hideTooltip();
+				removeBlur();
+			}
+			});
         voteList.appendChild(div);
       });
     }
