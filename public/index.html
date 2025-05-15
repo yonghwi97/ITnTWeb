@@ -212,50 +212,52 @@
 	
 	// 이름 목록 화면에 표시
 	function renderVotes(votes) {
-		voteList.innerHTML = '';
-		votes.sort((a, b) => b.vote_count - a.vote_count);
-	
-		votes.forEach((item, index) => {
-			const div = document.createElement('div');
-			div.className = 'vote-item';
-	
-			const info = document.createElement('div');
-			info.className = 'vote-info';
-	
-			let rankBadge = `${index + 1}등`;
-			let backgroundColor = '#f8f9fa';
-	
-			if (index === 0) {
-				rankBadge = '🏆 1등';
-				backgroundColor = '#ff6b6b';
-			} else if (index === 1) {
-				rankBadge = '🥈 2등';
-				backgroundColor = '#ffa94d';
-			} else if (index === 2) {
-				rankBadge = '🥉 3등';
-				backgroundColor = '#ffd43b';
-			}
-	
-			info.innerHTML = `
-				<span class="vote-rank">${rankBadge}</span> 
-				<span class="sw-name" data-reason="${item.reason || '사유 없음'}">${item.suggested_name}</span> 
-				(${item.vote_count}표)
-			`;
-	
-			div.style.backgroundColor = backgroundColor;
-	
-			const button = document.createElement('button');
-			button.className = 'vote-button';
-			button.innerHTML = '👍';
-			button.onclick = () => vote(item.suggested_name);
-	
-			div.appendChild(info);
-			div.appendChild(button);
-			voteList.appendChild(div);
-		});
-	
-		addTooltipEvents(); // ✅ 툴팁 이벤트 연결
+    voteList.innerHTML = '';
+    votes.sort((a, b) => b.vote_count - a.vote_count);
+
+    votes.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'vote-item';
+
+        const info = document.createElement('div');
+        info.className = 'vote-info';
+
+        let rankBadge = `${index + 1}등`;
+        let backgroundColor = '#f8f9fa'; // 기본
+
+        if (index === 0) {
+            rankBadge = '🏆 1등';
+            backgroundColor = '#FFD700'; // 금색
+        } else if (index === 1) {
+            rankBadge = '🥈 2등';
+            backgroundColor = '#C0C0C0'; // 은색
+        } else if (index === 2) {
+            rankBadge = '🥉 3등';
+            backgroundColor = '#CD7F32'; // 동색
+        }
+
+        info.innerHTML = `
+            <span class="vote-rank">${rankBadge}</span> 
+            <span class="sw-name" data-reason="${item.reason || '사유 없음'}">${item.suggested_name}</span> 
+            (${item.vote_count}표)
+        `;
+
+        div.style.backgroundColor = backgroundColor;
+        div.style.color = '#1c1c1c';
+
+        const button = document.createElement('button');
+        button.className = 'vote-button';
+        button.innerHTML = '👍';
+        button.onclick = () => vote(item.suggested_name);
+
+        div.appendChild(info);
+        div.appendChild(button);
+        voteList.appendChild(div);
+    });
+
+		addTooltipEvents(); // ✅ 다시 연결
 	}
+
 	
 	function addTooltipEvents() {
     const swNames = document.querySelectorAll('.sw-name');
@@ -270,7 +272,7 @@
         });
     });
 	}
-
+	
 	function showTooltip(text, x, y) {
 		let tooltip = document.getElementById('tooltip');
 		if (!tooltip) {

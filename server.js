@@ -17,13 +17,15 @@ const pool = new Pool({
 // 이름 + 투표수 가져오기
 app.get('/names', async (req, res) => {
     try {
-        const result = await pool.query('SELECT suggested_name, vote_count FROM submissions');
+        const result = await pool.query('SELECT suggested_name, vote_count, reason FROM submissions');
         res.json(result.rows);
     } catch (err) {
         console.error('DB 이름 조회 오류:', err);
         res.status(500).send('서버 오류');
     }
 });
+
+
 
 // 새로운 이름 제출
 app.post('/submit', async (req, res) => {
