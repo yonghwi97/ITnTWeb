@@ -98,11 +98,23 @@
       color: #3b5bdb;
     }
     .reason-button {
-      color: #6c757d;
-    }
-    .reason-button:hover {
-      color: #4c6ef5;
-    }
+	background: none;
+	border: none;
+	font-size: 16px; /* 작게 */
+	margin: 0;
+	padding: 0;
+	width: 24px;
+	height: 24px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #6c757d;
+	vertical-align: middle;
+	}
+	.reason-button:hover {
+	color: #4c6ef5;
+	}
+
     #tooltip, #modalOverlay {
       position: fixed;
       top: 0;
@@ -216,7 +228,7 @@ function renderVotes(votes) {
 async function vote(suggestedName) {
   openModal(async (name) => {
     if (!name) {
-      alert('이름을 입력해야 투표할 수 있습니다.');
+      alertModal('이름을 입력해야 투표할 수 있습니다.');
       return;
     }
 
@@ -228,23 +240,37 @@ async function vote(suggestedName) {
       });
 
       if (response.ok) {
-        alert('투표 완료!');
+        alertModal('투표 완료!');
         fetchNames();
       } else {
         const msg = await response.text();
-        alert(msg || '투표 실패');
+        alertModal(msg || '투표 실패');
       }
     } catch (error) {
       console.error('투표 오류:', error);
+      alertModal('서버 오류');
     }
   });
 }
+
 
 function openModal(callback) {
   modalCallback = callback;
   document.getElementById('modalOverlay').style.display = 'flex';
   document.getElementById('modalInput').value = '';
 }
+
+function alertModal(message) {
+  const tooltip = document.getElementById('tooltip');
+  tooltip.innerHTML = `
+    <div id="tooltipBox" style="text-align: center;">
+      <div style="margin-bottom: 20px;">${message}</div>
+      <button onclick="hideTooltip()" style="padding: 10px 20px; font-size: 16px; background: #4c6ef5; color: white; border: none; border-radius: 8px; cursor: pointer;">확인</button>
+    </div>
+  `;
+  tooltip.style.display = 'flex';
+}
+
 
 function submitModal() {
   const name = document.getElementById('modalInput').value.trim();
