@@ -281,7 +281,6 @@ function renderVotes(votes) {
     const div = document.createElement('div');
     div.className = 'vote-item';
 
-    // 등수에 따라 클래스 추가
     if (index === 0) div.classList.add('first-place');
     else if (index === 1) div.classList.add('second-place');
     else if (index === 2) div.classList.add('third-place');
@@ -290,7 +289,7 @@ function renderVotes(votes) {
       <div style="display: flex; align-items: center; gap: 6px;">
         ${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
         <div class="vote-info">${index + 1}등 - ${item.suggested_name}</div>
-        <button class="reason-button" onclick="showTooltip('${item.suggested_name}', '${item.reason || '사유 없음'}')">💬</button>
+        <button class="reason-button" data-name="${item.suggested_name}" data-reason="${item.reason || '사유 없음'}" onclick="handleReasonClick(this)">💬</button>
       </div>
       <div class="vote-actions">
         <div class="vote-count">(${item.vote_count}표)</div>
@@ -301,7 +300,26 @@ function renderVotes(votes) {
   });
 }
 
+function handleReasonClick(button) {
+  const name = button.getAttribute('data-name');
+  const reason = button.getAttribute('data-reason');
+  showTooltip(name, reason);
+}
+
+
 async function vote(suggestedName) {
+  // 1. 현재 시간 체크
+  const now = new Date();
+  const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC +9 (한국 시간)
+
+  const openDate = new Date('2025-05-22T00:00:00+09:00');
+
+  if (koreaTime < openDate) {
+    alertModal('⏰ 아직 투표 가능한 시간이 아닙니다.\n5월 22일 00시부터 투표할 수 있습니다.');
+    return; // 여기서 끝내고 아래 로직 실행하지 않음
+  }
+
+  // 2. 이후부터는 정상 투표 로직
   openModal(async (name) => {
     try {
       const response = await fetch('/vote', {
