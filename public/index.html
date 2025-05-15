@@ -123,6 +123,8 @@
 
 
 	<script>
+	let votes = [];  // 전역 votes 배열 추가
+	
 	const form = document.getElementById('submissionForm');
 	const voteList = document.getElementById('voteList');
 	
@@ -135,7 +137,7 @@
 
     const data = { name, suggestedName, reason };
 
-    // ✅ 제출 전에 중복 체크
+    // 제출 전에 중복 체크
     const existingNames = votes.map(v => v.suggested_name.toLowerCase());
     if (existingNames.includes(suggestedName.toLowerCase())) {
         showPopup('❗️ 이미 등록된 SW 이름입니다.');
@@ -169,11 +171,13 @@
 		try {
 			const response = await fetch('/names');
 			const names = await response.json();
-			renderVotes(names);
+			votes = names;  // 서버에서 받은 데이터를 전역 votes에 저장
+			renderVotes(votes);
 		} catch (error) {
 			console.error('이름 가져오기 에러:', error);
 		}
 	}
+
 	
 	// 투표 버튼 눌렀을 때
 	async function vote(suggestedName) {
