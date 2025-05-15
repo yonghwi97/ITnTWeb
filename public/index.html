@@ -115,6 +115,15 @@
 	color: #4c6ef5;
 	}
 
+	#tooltipBox {
+	background: white;
+	padding: 30px 25px;
+	border-radius: 16px;
+	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+	min-width: 320px;
+	text-align: left;
+	}
+
     #tooltip, #modalOverlay {
       position: fixed;
       top: 0;
@@ -179,9 +188,20 @@
   </div>
 
   
-  <div id="tooltipOverlay" style="display: none;">
-		<div id="tooltipBox"></div>
+  <div id="tooltipOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+">
+  <div id="tooltipBox">
   </div>
+</div>
+
 
 
   <div id="modalOverlay">
