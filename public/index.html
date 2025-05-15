@@ -282,15 +282,17 @@ function openModal(callback) {
 }
 
 function alertModal(message) {
-  const tooltip = document.getElementById('tooltip');
-  tooltip.innerHTML = `
-    <div id="tooltipBox" style="text-align: center;">
+  const overlay = document.getElementById('tooltipOverlay');
+  const box = document.getElementById('tooltipBox');
+  box.innerHTML = `
+    <div style="text-align: center;">
       <div style="margin-bottom: 20px;">${message}</div>
       <button onclick="hideTooltip()" style="padding: 10px 20px; font-size: 16px; background: #4c6ef5; color: white; border: none; border-radius: 8px; cursor: pointer;">확인</button>
     </div>
   `;
-  tooltip.style.display = 'flex';
+  overlay.style.display = 'flex';
 }
+
 
 
 function submitModal() {
@@ -353,7 +355,6 @@ function showTooltip(name, reason) {
   overlay.style.display = 'flex';
 }
 
-
 document.getElementById('tooltipOverlay').addEventListener('click', function(e) {
   if (e.target.id === 'tooltipOverlay') {
     hideTooltip();
@@ -364,16 +365,12 @@ function hideTooltip() {
   document.getElementById('tooltipOverlay').style.display = 'none';
 }
 
-
-
 function outsideClickListener(e) {
   const tooltip = document.getElementById('tooltip');
   if (tooltip && !tooltip.contains(e.target)) {
     hideTooltip();
   }
 }
-
-
 
 
 fetchNames();
