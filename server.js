@@ -53,32 +53,32 @@ app.get('/names', async (req, res) => {
 app.post('/vote', async (req, res) => {
   const { name, suggestedName } = req.body;
   try {
-    // 1. 이름으로 employees 테이블 조회
-    const employeeResult = await pool.query('SELECT has_voted FROM employees WHERE name = $1', [name]);
-
-    if (employeeResult.rows.length === 0) {
-      return res.status(400).send('존재하지 않는 이름입니다.');
-    }
-
-    if (employeeResult.rows[0].has_voted) {
-      return res.status(400).send('투표는 한 번만 하실 수 있습니다.');
-    }
-
-    // 2. submissions 테이블에서 SW 이름 찾기
-    const user = await pool.query('SELECT * FROM submissions WHERE suggested_name = $1', [suggestedName]);
+    // 이름 확인
+    const user = await pool.query('SELECT * FROM employees WHERE name = $1', [name]);
     if (user.rows.length === 0) {
-      return res.status(404).send('해당 이름이 존재하지 않습니다.');
+      return res.status(404).send('등록되지 않은 이름입니다.');
     }
 
-    // 3. 투표 수 증가
+    const votedCount = user.rows[0].has_voted || 0;
+    if (votedCount >= 10) {
+      return res.status(400).send('더 이상 투표할 수 없습니다.');
+    }
+
+    // 본인이 제출한 SW 이름인지 확인
+    const submission = await pool.query('SELECT * FROM submissions WHERE suggested_name = $1', [suggestedName]);
+    if (submission.rows.length > 0 && submission.rows[0].name === name) {
+      return res.status(400).send('본인이 제출한 SW 이름에는 투표할 수 없습니다.');
+    }
+
+    // 투표 집계
     await pool.query(
       'UPDATE submissions SET vote_count = vote_count + 1 WHERE suggested_name = $1',
       [suggestedName]
     );
 
-    // 4. employees 테이블 has_voted 업데이트
+    // 사용자 투표 횟수 +1
     await pool.query(
-      'UPDATE employees SET has_voted = TRUE WHERE name = $1',
+      'UPDATE employees SET has_voted = has_voted + 1 WHERE name = $1',
       [name]
     );
 
@@ -89,6 +89,23 @@ app.post('/vote', async (req, res) => {
   }
 });
 
+
+
+// 이름 유효성 체크 API
+app.post('/check-name', async (req, res) => {
+  const { name } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM employees WHERE name = $1', [name]);
+    if (result.rows.length > 0) {
+      res.send({ exists: true });
+    } else {
+      res.send({ exists: false });
+    }
+  } catch (err) {
+    console.error('이름 확인 오류:', err);
+    res.status(500).send('서버 오류');
+  }
+});
 
 // 메인 페이지
 app.get('/', (req, res) => {

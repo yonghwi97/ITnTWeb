@@ -59,19 +59,32 @@
     button:hover {
       background-color: #3b5bdb;
     }
-    .vote-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: nowrap;
-      width: 100%;
-      padding: 14px 20px;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      background-color: #f8f9fa;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      box-sizing: border-box;
-    }
+    
+	.vote-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: nowrap;
+		width: 100%;
+		padding: 14px 20px;
+		border-radius: 10px;
+		margin-bottom: 16px;
+		background-color: #f8f9fa;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+		box-sizing: border-box;
+		border: 2px solid transparent; 
+	}
+	
+	/* 순위별 특수 테두리 */
+	.first-place {
+		border-color: gold;
+	}
+	.second-place {
+		border-color: silver;
+	}
+	.third-place {
+		border-color: peru; 
+	}
     .vote-info {
       font-weight: 600;
       color: #1c1c1c;
@@ -180,7 +193,7 @@
         <input type="text" id="name" name="name" required>
         <label for="suggestedName">SW 이름</label>
         <input type="text" id="suggestedName" name="suggestedName" required>
-        <label for="reason">사유</label>
+        <label for="reason">설명</label>
         <textarea id="reason" name="reason" rows="4" required></textarea>
         <button type="submit">제출하기</button>
       </form>
@@ -234,6 +247,12 @@ function renderVotes(votes) {
   votes.forEach((item, index) => {
     const div = document.createElement('div');
     div.className = 'vote-item';
+
+    // 등수에 따라 클래스 추가
+    if (index === 0) div.classList.add('first-place');
+    else if (index === 1) div.classList.add('second-place');
+    else if (index === 2) div.classList.add('third-place');
+
     div.innerHTML = `
       <div style="display: flex; align-items: center; gap: 6px;">
         ${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
@@ -316,11 +335,25 @@ form.addEventListener('submit', async function(event) {
   const reason = document.getElementById('reason').value.trim();
 
   if (!name || !suggestedName || !reason) {
-    alert('모든 항목을 입력해주세요.');
+    alertModal('모든 항목을 입력해주세요.');
     return;
   }
 
   try {
+    // 여기서 이름 체크 먼저
+    const checkResponse = await fetch('/check-name', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    const checkResult = await checkResponse.json();
+
+    if (!checkResult.exists) {
+      alertModal('등록되지 않은 이름입니다.');
+      return;
+    }
+
+    // 이름이 정상 등록되어 있으면 제출
     const response = await fetch('/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -328,17 +361,19 @@ form.addEventListener('submit', async function(event) {
     });
 
     if (response.ok) {
-      alert('제출 완료!');
+      alertModal('제출 완료!');
       form.reset();
       fetchNames();
     } else {
       const msg = await response.text();
-      alert(msg || '제출 실패');
+      alertModal(msg || '제출 실패');
     }
   } catch (error) {
     console.error('제출 오류:', error);
+    alertModal('서버 오류');
   }
 });
+
 
 function showTooltip(name, reason) {
   const overlay = document.getElementById('tooltipOverlay');
