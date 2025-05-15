@@ -42,13 +42,13 @@ app.post('/submit', async (req, res) => {
 
 // 투표하기
 app.post('/vote', async (req, res) => {
-    const { employeeId, userName, suggestedName } = req.body;
+    const { userName, suggestedName } = req.body;  // employeeId 삭제
 
     try {
-        // 1. 사번과 이름으로 등록 여부 확인
+        // 1. 이름으로 등록 여부 확인
         const checkEmployee = await pool.query(
-            'SELECT * FROM employees WHERE employee_id = $1 AND name = $2',
-            [employeeId, userName]
+            'SELECT * FROM employees WHERE name = $1',
+            [userName]
         );
 
         if (checkEmployee.rows.length === 0) {
@@ -70,8 +70,8 @@ app.post('/vote', async (req, res) => {
 
         // 4. 투표 완료 처리
         await pool.query(
-            'UPDATE employees SET has_voted = TRUE WHERE employee_id = $1',
-            [employeeId]
+            'UPDATE employees SET has_voted = TRUE WHERE name = $1',
+            [userName]
         );
 
         res.send('투표 완료!');
@@ -80,6 +80,7 @@ app.post('/vote', async (req, res) => {
         res.status(500).send('서버 오류');
     }
 });
+
 
 
 // 메인 페이지

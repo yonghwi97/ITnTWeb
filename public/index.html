@@ -107,21 +107,18 @@
 
     <div class="form-container">
         <h1>이름 공모</h1>
-        <form id="submissionForm">
-            <label for="employeeId">사번</label>
-            <input type="text" id="employeeId" name="employeeId" required>
-
-            <label for="name">이름</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="suggestedName">SW 이름</label>
-            <input type="text" id="suggestedName" name="suggestedName" required>
-
-            <label for="reason">사유</label>
-            <textarea id="reason" name="reason" rows="4" required></textarea>
-
-            <button type="submit" class="submit-btn">제출하기</button>
-        </form>
+		<form id="submissionForm">
+			<label for="name">이름</label>
+			<input type="text" id="name" name="name" required>
+		
+			<label for="suggestedName">SW 이름</label>
+			<input type="text" id="suggestedName" name="suggestedName" required>
+		
+			<label for="reason">사유</label>
+			<textarea id="reason" name="reason" rows="4" required></textarea>
+		
+			<button class="submit-btn" type="submit">제출하기</button>
+		</form>
     </div>
 
 
@@ -172,10 +169,9 @@
 	
 	// 투표 버튼 눌렀을 때
 	async function vote(suggestedName) {
-		const employeeId = prompt('사번을 입력하세요:');
 		const userName = prompt('이름을 입력하세요:');
-		if (!employeeId || !userName) {
-			showPopup('❗️ 사번과 이름을 입력해야 투표할 수 있습니다.');
+		if (!userName) {
+			showPopup('❗️ 이름을 입력해야 투표할 수 있습니다.');
 			return;
 		}
 		try {
@@ -183,7 +179,6 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					employeeId: employeeId,
 					userName: userName,
 					suggestedName: suggestedName
 				})
@@ -200,6 +195,7 @@
 			showPopup('❗️ 서버 오류 발생');
 		}
 	}
+
 
 	
 	// 이름 목록 화면에 표시
