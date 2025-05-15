@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SV3 SW 이름 공모전</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+        .form-container, .ranking-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .vote-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
+            background-color: #f8f9fa;
+        }
+        .vote-item:hover {
+            transform: scale(1.02);
+        }
+        .vote-info {
+            font-weight: 600;
+            color: #1c1c1c;
+        }
+        .vote-button {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #5c7cfa;
+            cursor: pointer;
+        }
+        .vote-button:hover {
+            color: #4c6ef5;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>SV3 SW 이름 공모전</h1>
+        <form id="submissionForm">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="suggestedName">SW 이름</label>
+            <input type="text" id="suggestedName" name="suggestedName" required>
+
+            <label for="reason">사유</label>
+            <textarea id="reason" name="reason" rows="4" required></textarea>
+
+            <button type="submit">제출하기</button>
+        </form>
+    </div>
+
+    <div class="ranking-container">
+        <h2>투표 순위</h2>
+        <div id="voteList"></div>
+    </div>
+
+    <script>
+        const voteList = document.getElementById('voteList');
+        const form = document.getElementById('submissionForm');
+
+        async function fetchNames() {
+            try {
+                const response = await fetch('/names');
+                const names = await response.json();
+                renderVotes(names);
+            } catch (error) {
+                console.error('이름 가져오기 오류:', error);
+            }
+        }
+
+        function renderVotes(votes) {
+            voteList.innerHTML = '';
+            votes.sort((a, b) => b.vote_count - a.vote_count);
+
+            votes.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'vote-item';
+                div.innerHTML = `
+                    <div class="vote-info">
+                        ${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
+                        ${index + 1}등 - ${item.suggested_name} (${item.vote_count}표)
+                    </div>
+                    <button class="vote-button" onclick="vote('${item.suggested_name}')">👍</button>
+                `;
+                div.setAttribute('data-reason', item.reason || '사유 없음');
+                div.addEventListener('mouseenter', () => {
+                    showTooltip(div.getAttribute('data-reason'));
+                    applyBlur();
+                });
+                div.addEventListener('mouseleave', () => {
+                    hideTooltip();
+                    removeBlur();
+                });
+                voteList.appendChild(div);
+            });
+        }
+
+        async function vote(suggestedName) {
+            const name = prompt('당신의 이름을 입력하세요.');
+            if (!name) {
+                alert('이름을 입력해야 투표할 수 있습니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/vote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, suggestedName })
+                });
+
+                if (response.ok) {
+                    alert('투표 완료!');
+                    fetchNames();
+                } else {
+                    const msg = await response.text();
+                    alert(msg || '투표 실패');
+                }
+            } catch (error) {
+                console.error('투표 오류:', error);
+            }
+        }
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const suggestedName = document.getElementById('suggestedName').value.trim();
+            const reason = document.getElementById('reason').value.trim();
+
+            if (!name || !suggestedName || !reason) {
+                alert('모든 항목을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, suggestedName, reason })
+                });
+
+                if (response.ok) {
+                    alert('제출 완료!');
+                    form.reset();
+                    fetchNames();
+                } else {
+                    const msg = await response.text();
+                    alert(msg || '제출 실패');
+                }
+            } catch (error) {
+                console.error('제출 오류:', error);
+            }
+        });
+
+        function showTooltip(text) {
+            let tooltip = document.getElementById('tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'tooltip';
+                tooltip.style.position = 'fixed';
+                tooltip.style.top = '50%';
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
+                tooltip.style.minWidth = '300px';
+                tooltip.style.background = 'rgba(50, 50, 50, 0.9)';
+                tooltip.style.color = 'white';
+                tooltip.style.padding = '20px 30px';
+                tooltip.style.borderRadius = '12px';
+                tooltip.style.fontSize = '18px';
+                tooltip.style.fontWeight = '500';
+                tooltip.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+                tooltip.style.backdropFilter = 'blur(6px)';
+                tooltip.style.transition = 'opacity 0.4s ease';
+                tooltip.style.pointerEvents = 'none';
+                tooltip.style.opacity = '0';
+                tooltip.style.zIndex = '1000';
+                document.body.appendChild(tooltip);
+            }
+
+            tooltip.textContent = text;
+            tooltip.style.opacity = '1';
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tooltip) {
+                        tooltip.remove();
+                    }
+                }, 400);
+            }
+        }
+
+        function applyBlur() {
+            let blurOverlay = document.getElementById('blur-overlay');
+            if (!blurOverlay) {
+                blurOverlay = document.createElement('div');
+                blurOverlay.id = 'blur-overlay';
+                blurOverlay.style.position = 'fixed';
+                blurOverlay.style.top = '0';
+                blurOverlay.style.left = '0';
+                blurOverlay.style.width = '100%';
+                blurOverlay.style.height = '100%';
+                blurOverlay.style.background = 'rgba(255, 255, 255, 0.3)';
+                blurOverlay.style.backdropFilter = 'blur(0px)';
+                blurOverlay.style.transition = 'backdrop-filter 0.4s ease, background 0.4s ease';
+                blurOverlay.style.zIndex = '998';
+                blurOverlay.style.pointerEvents = 'none';
+                document.body.appendChild(blurOverlay);
+            }
+
+            setTimeout(() => {
+                blurOverlay.style.backdropFilter = 'blur(6px)';
+                blurOverlay.style.background = 'rgba(255, 255, 255, 0.5)';
+            }, 50);
+        }
+
+        function removeBlur() {
+            const blurOverlay = document.getElementById('blur-overlay');
+            if (blurOverlay) {
+                blurOverlay.style.backdropFilter = 'blur(0px)';
+                blurOverlay.style.background = 'rgba(255, 255, 255, 0.0)';
+                setTimeout(() => {
+                    if (blurOverlay) {
+                        blurOverlay.remove();
+                    }
+                }, 400);
+            }
+        }
+
+        fetchNames();
+        setInterval(fetchNames, 10000);
+    </script>
+</body>
+</html>
