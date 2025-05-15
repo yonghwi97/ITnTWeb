@@ -133,7 +133,14 @@
     const suggestedName = document.getElementById('suggestedName').value.trim();
     const reason = document.getElementById('reason').value.trim();
 
-    const data = { name, suggestedName, reason }; // employeeId 제거!
+    const data = { name, suggestedName, reason };
+
+    // ✅ 제출 전에 중복 체크
+    const existingNames = votes.map(v => v.suggested_name.toLowerCase());
+    if (existingNames.includes(suggestedName.toLowerCase())) {
+        showPopup('❗️ 이미 등록된 SW 이름입니다.');
+        return;
+    }
 
     try {
         const response = await fetch('/submit', {
@@ -147,13 +154,14 @@
             form.reset();
             await fetchNames();
         } else {
-            showPopup('제출 실패. 다시 시도하세요.');
+            showPopup('❗️ 제출 실패. 다시 시도하세요.');
         }
     } catch (error) {
         console.error('에러:', error);
-        showPopup('서버 오류 발생');
+        showPopup('❗️ 서버 오류 발생');
     }
 	});
+
 
 	
 	// 이름 + 투표수 가져오기
@@ -209,7 +217,28 @@
 	
 			const info = document.createElement('div');
 			info.className = 'vote-info';
-			info.innerHTML = `<span class="vote-rank">${index + 1}등</span> ${item.suggested_name} (${item.vote_count}표)`;
+	
+			let rankBadge = `${index + 1}등`;
+			let backgroundColor = '#f8f9fa';
+	
+			if (index === 0) {
+				rankBadge = '🏆 1등';
+				backgroundColor = '#ff6b6b';
+			} else if (index === 1) {
+				rankBadge = '🥈 2등';
+				backgroundColor = '#ffa94d';
+			} else if (index === 2) {
+				rankBadge = '🥉 3등';
+				backgroundColor = '#ffd43b';
+			}
+	
+			info.innerHTML = `
+				<span class="vote-rank">${rankBadge}</span> 
+				<span class="sw-name" data-reason="${item.reason || '사유 없음'}">${item.suggested_name}</span> 
+				(${item.vote_count}표)
+			`;
+	
+			div.style.backgroundColor = backgroundColor;
 	
 			const button = document.createElement('button');
 			button.className = 'vote-button';
@@ -220,8 +249,59 @@
 			div.appendChild(button);
 			voteList.appendChild(div);
 		});
+	
+		addTooltipEvents(); // ✅ 툴팁 이벤트 연결
+	}
+	
+	function addTooltipEvents() {
+    const swNames = document.querySelectorAll('.sw-name');
+
+    swNames.forEach(sw => {
+        sw.addEventListener('mouseenter', function (e) {
+            const reason = e.target.getAttribute('data-reason');
+            showTooltip(reason, e.pageX, e.pageY);
+        });
+        sw.addEventListener('mouseleave', function () {
+            hideTooltip();
+        });
+    });
 	}
 
+	function showTooltip(text, x, y) {
+		let tooltip = document.getElementById('tooltip');
+		if (!tooltip) {
+			tooltip = document.createElement('div');
+			tooltip.id = 'tooltip';
+			tooltip.style.position = 'absolute';
+			tooltip.style.background = '#333';
+			tooltip.style.color = 'white';
+			tooltip.style.padding = '8px 12px';
+			tooltip.style.borderRadius = '8px';
+			tooltip.style.fontSize = '14px';
+			tooltip.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+			tooltip.style.transition = 'opacity 0.3s ease';
+			tooltip.style.pointerEvents = 'none';
+			tooltip.style.opacity = '0';
+			document.body.appendChild(tooltip);
+		}
+	
+		tooltip.textContent = text;
+		tooltip.style.left = (x + 10) + 'px';
+		tooltip.style.top = (y + 10) + 'px';
+		tooltip.style.opacity = '1';
+	}
+	
+	function hideTooltip() {
+		const tooltip = document.getElementById('tooltip');
+		if (tooltip) {
+			tooltip.style.opacity = '0';
+			setTimeout(() => {
+				if (tooltip) {
+					tooltip.remove();
+				}
+			}, 300);
+		}
+	}
 
 	
 	// 팝업 표시
