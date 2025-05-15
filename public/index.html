@@ -353,6 +353,7 @@ function showTooltip(name, reason) {
   overlay.style.display = 'flex';
 }
 
+
 document.getElementById('tooltipOverlay').addEventListener('click', function(e) {
   if (e.target.id === 'tooltipOverlay') {
     hideTooltip();
@@ -373,15 +374,6 @@ function outsideClickListener(e) {
 }
 
 
-document.addEventListener('click', function(e) {
-  const tooltip = document.getElementById('tooltip');
-  if (tooltip && tooltip.style.display === 'flex') {
-    const tooltipBox = document.getElementById('tooltipBox');
-    if (!tooltipBox.contains(e.target)) {
-      hideTooltip();
-    }
-  }
-});
 
 
 fetchNames();
