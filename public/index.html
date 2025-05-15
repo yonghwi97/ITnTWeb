@@ -178,7 +178,12 @@
     </div>
   </div>
 
-  <div id="tooltip"></div>
+  
+  <div id="tooltipOverlay" style="display: none;">
+		<div id="tooltipBox"></div>
+  </div>
+
+
   <div id="modalOverlay">
     <div id="modal">
       <p>이름을 입력하세요.</p>
@@ -317,25 +322,27 @@ form.addEventListener('submit', async function(event) {
 });
 
 function showTooltip(name, reason) {
-  const tooltip = document.getElementById('tooltip');
-  tooltip.innerHTML = `
-    <div id="tooltipBox">
-      <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
-      <div style="margin-bottom: 20px;">${name}</div>
-      <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">사유</div>
-      <div>${reason}</div>
-    </div>
+  const overlay = document.getElementById('tooltipOverlay');
+  const box = document.getElementById('tooltipBox');
+  box.innerHTML = `
+    <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
+    <div style="margin-bottom: 20px;">${name}</div>
+    <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">사유</div>
+    <div>${reason}</div>
   `;
-  tooltip.style.display = 'flex';
+  overlay.style.display = 'flex';
 }
 
+document.getElementById('tooltipOverlay').addEventListener('click', function(e) {
+  if (e.target.id === 'tooltipOverlay') {
+    hideTooltip();
+  }
+});
 
 function hideTooltip() {
-  const tooltip = document.getElementById('tooltip');
-  if (tooltip) {
-    tooltip.style.display = 'none'; // 없애지 말고 숨겨
-  }
+  document.getElementById('tooltipOverlay').style.display = 'none';
 }
+
 
 
 function outsideClickListener(e) {
