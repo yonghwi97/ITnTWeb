@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>SV3 SW 이름 공모전</title>
+  <title>SV3 SW 플랫폼 이름 공모</title>
   <style>
     body {
       margin: 0;
@@ -44,7 +44,8 @@
       font-size: 14px;
     }
     button {
-      padding: 10px 14px;
+      width: 100%;
+      padding: 14px;
       background-color: #4c6ef5;
       color: white;
       font-weight: bold;
@@ -66,39 +67,26 @@
       margin-bottom: 16px;
       background-color: #f8f9fa;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .vote-item:hover {
-      transform: scale(1.02);
-      background-color: #eef1f6;
     }
     .vote-info {
       font-weight: 600;
       color: #1c1c1c;
-      flex-grow: 1;
-    }
-    .vote-actions {
-      display: flex;
-      gap: 6px;
     }
     .vote-button, .reason-button {
       background: none;
       border: none;
       font-size: 20px;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      border-radius: 50%;
-      background-color: #e7f0ff;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      margin-left: 10px;
     }
-    .vote-button:hover, .reason-button:hover {
-      background-color: #d0e1ff;
+    .vote-button:hover {
+      color: #3b5bdb;
+    }
+    .reason-button {
+      color: #6c757d;
+    }
+    .reason-button:hover {
+      color: #4c6ef5;
     }
     #tooltip {
       position: fixed;
@@ -106,25 +94,14 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: white;
-      color: #333;
-      padding: 24px 32px;
+      padding: 20px 25px;
       border-radius: 16px;
-      font-size: 16px;
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
       backdrop-filter: blur(6px);
       z-index: 1000;
-      text-align: left;
-      white-space: pre-line;
       min-width: 260px;
       max-width: 400px;
       border: 1px solid #d0d0d0;
-      display: none;
-    }
-    #tooltip strong {
-      display: block;
-      margin-bottom: 8px;
-      color: #4c6ef5;
-      font-size: 18px;
     }
   </style>
 </head>
@@ -136,9 +113,9 @@
     </div>
 
     <div class="form-container">
-      <h1>이름 공모</h1>
+      <h1>SV3 SW 플랫폼 이름 공모</h1>
       <form id="submissionForm">
-        <label for="name">이름</label>
+        <label for="name">제출자 성함</label>
         <input type="text" id="name" name="name" required>
 
         <label for="suggestedName">SW 이름</label>
@@ -152,12 +129,9 @@
     </div>
   </div>
 
-  <div id="tooltip"></div>
-
   <script>
     const voteList = document.getElementById('voteList');
     const form = document.getElementById('submissionForm');
-    const tooltip = document.getElementById('tooltip');
 
     async function fetchNames() {
       try {
@@ -181,7 +155,7 @@
             ${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
             ${index + 1}등 - ${item.suggested_name} (${item.vote_count}표)
           </div>
-          <div class="vote-actions">
+          <div>
             <button class="vote-button" onclick="vote('${item.suggested_name}')">👍</button>
             <button class="reason-button" onclick="showTooltip('${item.suggested_name}', '${item.reason || '사유 없음'}')">❓</button>
           </div>
@@ -191,7 +165,7 @@
     }
 
     async function vote(suggestedName) {
-      const name = prompt('당신의 이름을 입력하세요.');
+      const name = prompt('이름을 입력하세요.');
       if (!name) {
         alert('이름을 입력해야 투표할 수 있습니다.');
         return;
@@ -248,20 +222,29 @@
     });
 
     function showTooltip(name, reason) {
+      let tooltip = document.getElementById('tooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'tooltip';
+        document.body.appendChild(tooltip);
+      }
       tooltip.innerHTML = `
-        <div style="text-align: right;">
-          <button onclick="hideTooltip()" style="background:none;border:none;font-size:18px;cursor:pointer;">❌</button>
+        <div style="display: flex; justify-content: flex-end;">
+          <button onclick="hideTooltip()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#ff4d4f;">❌</button>
         </div>
-        <div style="margin-top:10px;">
-          <strong>SW 이름</strong>: ${name}<br>
-          <strong>사유</strong>: ${reason}
+        <div style="margin-top: 5px; padding: 0 5px; text-align: left;">
+          <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">SW 이름</div>
+          <div style="margin-bottom: 12px;">${name}</div>
+          <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">사유</div>
+          <div>${reason}</div>
         </div>
       `;
       tooltip.style.display = 'block';
     }
 
     function hideTooltip() {
-      tooltip.style.display = 'none';
+      const tooltip = document.getElementById('tooltip');
+      if (tooltip) tooltip.remove();
     }
 
     fetchNames();
