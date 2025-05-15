@@ -260,41 +260,53 @@
 
 	
 	function addTooltipEvents() {
-    const voteItems = document.querySelectorAll('.vote-item');
-
-    voteItems.forEach(item => {
-        const reason = item.querySelector('.sw-name')?.getAttribute('data-reason') || '사유 없음';
-
-        item.addEventListener('mouseenter', function (e) {
-            showTooltip(reason, e.pageX, e.pageY);
-            applyBlur();
-        });
-        item.addEventListener('mouseleave', function () {
-            hideTooltip();
-            removeBlur();
-        });
-    });
+		const voteItems = document.querySelectorAll('.vote-item');
+	
+		voteItems.forEach(item => {
+			const reason = item.querySelector('.sw-name')?.getAttribute('data-reason') || '사유 없음';
+	
+			item.addEventListener('mouseenter', function () {
+				showTooltip(reason);
+				applyBlur();
+			});
+			item.addEventListener('mouseleave', function () {
+				hideTooltip();
+				removeBlur();
+			});
+		});
 	}
 
+
 	
-	function showTooltip(text, x, y) {
-    let tooltip = document.getElementById('tooltip');
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.id = 'tooltip';
-        tooltip.style.position = 'absolute';
-        tooltip.style.background = '#333';
-        tooltip.style.color = 'white';
-        tooltip.style.padding = '8px 12px';
-        tooltip.style.borderRadius = '8px';
-        tooltip.style.fontSize = '14px';
-        tooltip.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-        tooltip.style.transition = 'opacity 0.3s ease';
-        tooltip.style.pointerEvents = 'none';
-        tooltip.style.opacity = '0';
-        tooltip.style.zIndex = '1000';
-        document.body.appendChild(tooltip);
-    }
+	function showTooltip(text) {
+		let tooltip = document.getElementById('tooltip');
+		if (!tooltip) {
+			tooltip = document.createElement('div');
+			tooltip.id = 'tooltip';
+			tooltip.style.position = 'fixed';
+			tooltip.style.top = '50%';
+			tooltip.style.left = '50%';
+			tooltip.style.transform = 'translate(-50%, -50%)';
+			tooltip.style.min-width = '300px';
+			tooltip.style.background = 'rgba(50, 50, 50, 0.9)';
+			tooltip.style.color = 'white';
+			tooltip.style.padding = '20px 30px';
+			tooltip.style.borderRadius = '12px';
+			tooltip.style.fontSize = '18px';
+			tooltip.style.font-weight = '500';
+			tooltip.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+			tooltip.style.backdropFilter = 'blur(6px)';
+			tooltip.style.transition = 'opacity 0.4s ease';
+			tooltip.style.pointerEvents = 'none';
+			tooltip.style.opacity = '0';
+			tooltip.style.zIndex = '1000';
+			document.body.appendChild(tooltip);
+		}
+	
+		tooltip.textContent = text;
+		tooltip.style.opacity = '1';
+	}
+
 
     tooltip.textContent = text;
     tooltip.style.left = (x + 10) + 'px';
@@ -310,9 +322,10 @@
 				if (tooltip) {
 					tooltip.remove();
 				}
-			}, 300);
+			}, 400); // fade out duration과 맞춰서
 		}
 	}
+
 
 
 	
@@ -349,30 +362,43 @@
 	}
 	
 	function applyBlur() {
-    let blurOverlay = document.getElementById('blur-overlay');
-    if (!blurOverlay) {
-        blurOverlay = document.createElement('div');
-        blurOverlay.id = 'blur-overlay';
-        blurOverlay.style.position = 'fixed';
-        blurOverlay.style.top = '0';
-        blurOverlay.style.left = '0';
-        blurOverlay.style.width = '100%';
-        blurOverlay.style.height = '100%';
-        blurOverlay.style.background = 'rgba(255, 255, 255, 0.6)';
-        blurOverlay.style.backdropFilter = 'blur(4px)';
-        blurOverlay.style.zIndex = '999'; // vote-item보다 아래에 깔릴 정도로
-        blurOverlay.style.pointerEvents = 'none'; // 클릭 방해 안 하게
-        document.body.appendChild(blurOverlay);
-    }
-    blurOverlay.style.display = 'block';
+		let blurOverlay = document.getElementById('blur-overlay');
+		if (!blurOverlay) {
+			blurOverlay = document.createElement('div');
+			blurOverlay.id = 'blur-overlay';
+			blurOverlay.style.position = 'fixed';
+			blurOverlay.style.top = '0';
+			blurOverlay.style.left = '0';
+			blurOverlay.style.width = '100%';
+			blurOverlay.style.height = '100%';
+			blurOverlay.style.background = 'rgba(255, 255, 255, 0.3)';
+			blurOverlay.style.backdropFilter = 'blur(0px)';
+			blurOverlay.style.transition = 'backdrop-filter 0.4s ease, background 0.4s ease';
+			blurOverlay.style.zIndex = '998'; // tooltip보다 밑에
+			blurOverlay.style.pointerEvents = 'none';
+			document.body.appendChild(blurOverlay);
+		}
+	
+		// 약간 텀을 두고 자연스럽게 흐림
+		setTimeout(() => {
+			blurOverlay.style.backdropFilter = 'blur(6px)';
+			blurOverlay.style.background = 'rgba(255, 255, 255, 0.5)';
+		}, 50);
 	}
 	
 	function removeBlur() {
 		const blurOverlay = document.getElementById('blur-overlay');
 		if (blurOverlay) {
-			blurOverlay.style.display = 'none';
+			blurOverlay.style.backdropFilter = 'blur(0px)';
+			blurOverlay.style.background = 'rgba(255, 255, 255, 0.0)';
+			setTimeout(() => {
+				if (blurOverlay) {
+					blurOverlay.remove();
+				}
+			}, 400); // 부드럽게 사라진 다음에 삭제
 		}
 	}
+
 
 	
 	// 페이지 처음 로딩할 때
