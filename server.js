@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(express.static(__dirname)); // public 폴더 대신 루트 폴더 기준
+app.use(express.static(path.join(__dirname, 'public'))); // public 폴더 기준 정적 파일 제공
 
 // PostgreSQL 연결
 const pool = new Pool({
@@ -19,7 +19,6 @@ const pool = new Pool({
 app.post('/submit', async (req, res) => {
   const { name, suggestedName, reason } = req.body;
   try {
-    // 중복 체크
     const existing = await pool.query(
       'SELECT * FROM submissions WHERE suggested_name = $1',
       [suggestedName]
@@ -63,7 +62,6 @@ app.post('/vote', async (req, res) => {
       'UPDATE submissions SET vote_count = vote_count + 1 WHERE suggested_name = $1',
       [suggestedName]
     );
-
     res.send('투표 완료!');
   } catch (err) {
     console.error('투표 오류:', err);
@@ -73,7 +71,7 @@ app.post('/vote', async (req, res) => {
 
 // 메인 페이지
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const port = process.env.PORT || 3000;
