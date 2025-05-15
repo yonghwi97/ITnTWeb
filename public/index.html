@@ -284,11 +284,19 @@ function renderVotes(votes) {
     else if (index === 1) div.classList.add('second-place');
     else if (index === 2) div.classList.add('third-place');
 
+    // 여기가 중요! reason을 HTML 속성에 안전하게 인코딩해야 함
+    const safeReason = (item.reason || '사유 없음')
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
     div.innerHTML = `
       <div style="display: flex; align-items: center; gap: 6px;">
         ${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
         <div class="vote-info">${index + 1}등 - ${item.suggested_name}</div>
-        <button class="reason-button" data-name="${item.suggested_name}" data-reason="${item.reason || '사유 없음'}" onclick="handleReasonClick(this)">💬</button>
+        <button class="reason-button" data-name="${item.suggested_name}" data-reason="${safeReason}" onclick="handleReasonClick(this)">💬</button>
       </div>
       <div class="vote-actions">
         <div class="vote-count">(${item.vote_count}표)</div>
@@ -298,6 +306,7 @@ function renderVotes(votes) {
     voteList.appendChild(div);
   });
 }
+
 
 function handleReasonClick(button) {
   const name = button.getAttribute('data-name');
