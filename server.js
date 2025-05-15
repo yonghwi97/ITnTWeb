@@ -27,11 +27,11 @@ app.get('/names', async (req, res) => {
 
 // 새로운 이름 제출
 app.post('/submit', async (req, res) => {
-    const { employeeId, name, suggestedName, reason } = req.body;
+    const { name, suggestedName, reason } = req.body;
     try {
         await pool.query(
-            'INSERT INTO submissions (employee_id, name, suggested_name, reason, vote_count) VALUES ($1, $2, $3, $4, 0)',
-            [employeeId, name, suggestedName, reason]
+            'INSERT INTO submissions (name, suggested_name, reason, vote_count) VALUES ($1, $2, $3, 0)',
+            [name, suggestedName, reason]
         );
         res.send('제출 완료!');
     } catch (err) {

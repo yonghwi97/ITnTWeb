@@ -127,34 +127,34 @@
 	const voteList = document.getElementById('voteList');
 	
 	form.addEventListener('submit', async function(event) {
-		event.preventDefault();
-	
-		const employeeId = document.getElementById('employeeId').value.trim();
-		const name = document.getElementById('name').value.trim();
-		const suggestedName = document.getElementById('suggestedName').value.trim();
-		const reason = document.getElementById('reason').value.trim();
-	
-		const data = { employeeId, name, suggestedName, reason };
-	
-		try {
-			const response = await fetch('/submit', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data)
-			});
-	
-			if (response.ok) {
-				showPopup('🎉 제출 완료! 감사합니다!');
-				form.reset();
-				await fetchNames();
-			} else {
-				showPopup('❗️ 제출 실패. 다시 시도하세요.');
-			}
-		} catch (error) {
-			console.error('에러:', error);
-			showPopup('❗️ 서버 오류 발생');
-		}
+    event.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const suggestedName = document.getElementById('suggestedName').value.trim();
+    const reason = document.getElementById('reason').value.trim();
+
+    const data = { name, suggestedName, reason }; // employeeId 제거!
+
+    try {
+        const response = await fetch('/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showPopup('제출 완료! 감사합니다!');
+            form.reset();
+            await fetchNames();
+        } else {
+            showPopup('제출 실패. 다시 시도하세요.');
+        }
+    } catch (error) {
+        console.error('에러:', error);
+        showPopup('서버 오류 발생');
+    }
 	});
+
 	
 	// 이름 + 투표수 가져오기
 	async function fetchNames() {
@@ -184,15 +184,15 @@
 				})
 			});
 			if (response.ok) {
-				showPopup(`✅ ${suggestedName}에 투표 완료!`);
+				showPopup(`${suggestedName}에 투표 완료!`);
 				await fetchNames(); // 목록 새로고침
 			} else {
 				const errorMessage = await response.text();
-				showPopup('❗️ ' + errorMessage);
+				showPopup(errorMessage);
 			}
 		} catch (error) {
 			console.error('투표 에러:', error);
-			showPopup('❗️ 서버 오류 발생');
+			showPopup('서버 오류 발생');
 		}
 	}
 
