@@ -234,30 +234,32 @@
 		}
 		
 		async function vote(suggestedName) {
-		const name = prompt('이름을 입력하세요.');
-		if (!name) {
-			alert('이름을 입력해야 투표할 수 있습니다.');
-			return;
-		}
-		
-		try {
-			const response = await fetch('/vote', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name, suggestedName })
+			openModal('이름을 입력하세요.', true, async (name) => {
+				if (!name) {
+				openModal('이름을 입력해야 투표할 수 있습니다.', false, () => {});
+				return;
+				}
+			
+				try {
+				const response = await fetch('/vote', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ name, suggestedName })
+				});
+			
+				if (response.ok) {
+					openModal('투표 완료!', false, fetchNames);
+				} else {
+					const msg = await response.text();
+					openModal(msg || '투표 실패', false, () => {});
+				}
+				} catch (error) {
+				console.error('투표 오류:', error);
+				openModal('서버 오류', false, () => {});
+				}
 			});
-		
-			if (response.ok) {
-			alert('투표 완료!');
-			fetchNames();
-			} else {
-			const msg = await response.text();
-			alert(msg || '투표 실패');
-			}
-		} catch (error) {
-			console.error('투표 오류:', error);
 		}
-		}
+
 		
 		form.addEventListener('submit', async function(event) {
 		event.preventDefault();
@@ -291,34 +293,41 @@
 		});
 		
 		function showTooltip(name, reason) {
-		let tooltip = document.getElementById('tooltip');
-		if (!tooltip) {
-			tooltip = document.createElement('div');
-			tooltip.id = 'tooltip';
-			document.body.appendChild(tooltip);
+			let tooltip = document.getElementById('tooltip');
+			if (!tooltip) {
+				tooltip = document.createElement('div');
+				tooltip.id = 'tooltip';
+				document.body.appendChild(tooltip);
+			}
+			
+			tooltip.innerHTML = `
+				<div style="position: relative; padding: 20px 20px 20px 20px;">
+				<!-- X 버튼은 절대 위치 고정 -->
+				<button onclick="hideTooltip()" style="
+					position: absolute;
+					top: 10px;
+					right: 10px;
+					background: none;
+					border: none;
+					font-size: 20px;
+					cursor: pointer;
+					color: #ff4d4f;
+				">❌</button>
+			
+				<!-- 본문은 X버튼 아래에서 시작 -->
+				<div style="padding-top: 40px; text-align: left;">
+					<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
+					<div style="margin-bottom: 20px;">${name}</div>
+					<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">사유</div>
+					<div>${reason}</div>
+				</div>
+				</div>
+			`;
+			
+			tooltip.style.display = 'block';
 		}
-		tooltip.innerHTML = `
-			<div style="position: relative; padding: 20px;">
-			<button onclick="hideTooltip()" style="
-				position: absolute;
-				top: 12px;
-				right: 12px;
-				background: none;
-				border: none;
-				font-size: 20px;
-				cursor: pointer;
-				color: #ff4d4f;
-			">❌</button>
-			<div style="margin-top: 40px; text-align: left;">
-				<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">SW 이름</div>
-				<div style="margin-bottom: 12px;">${name}</div>
-				<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">사유</div>
-				<div>${reason}</div>
-			</div>
-			</div>
-		`;
-		tooltip.style.display = 'block';
-		}
+
+
 
 		
 		function hideTooltip() {
