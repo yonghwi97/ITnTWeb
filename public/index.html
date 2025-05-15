@@ -128,6 +128,39 @@
       max-width: 400px;
       border: 1px solid #d0d0d0;
     }
+	#modal {
+	position: fixed;
+	top: 0; left: 0;
+	width: 100%; height: 100%;
+	background: rgba(0,0,0,0.4);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2000;
+	}
+	
+	#modal-content {
+	background: white;
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+	text-align: center;
+	min-width: 280px;
+	}
+	
+	#modal-message {
+	margin-bottom: 20px;
+	font-size: 18px;
+	}
+	
+	#modal-input {
+	width: 80%;
+	padding: 8px;
+	margin-bottom: 20px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	}
+
   </style>
 </head>
 
@@ -155,6 +188,14 @@
       </form>
     </div>
   </div>
+  <div id="modal" style="display:none;">
+	<div id="modal-content">
+		<div id="modal-message"></div>
+		<input id="modal-input" type="text" style="display:none;">
+		<button id="modal-confirm">확인</button>
+	</div>
+  </div>
+
 
 	<script>
 		const voteList = document.getElementById('voteList');
@@ -284,6 +325,25 @@
 		const tooltip = document.getElementById('tooltip');
 		if (tooltip) tooltip.remove();
 		}
+		
+		function openModal(message, withInput = false, callback) {
+			const modal = document.getElementById('modal');
+			const modalMessage = document.getElementById('modal-message');
+			const modalInput = document.getElementById('modal-input');
+			const modalConfirm = document.getElementById('modal-confirm');
+			
+			modal.style.display = 'flex';
+			modalMessage.innerText = message;
+			modalInput.style.display = withInput ? 'block' : 'none';
+			modalInput.value = '';
+			
+			modalConfirm.onclick = () => {
+				const value = modalInput.value.trim();
+				modal.style.display = 'none';
+				callback(withInput ? value : null);
+			};
+		}
+
 		
 		fetchNames();
 		setInterval(fetchNames, 10000);
