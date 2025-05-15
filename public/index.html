@@ -59,52 +59,60 @@
       background-color: #3b5bdb;
     }
     .vote-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 14px 20px;
-	border-radius: 10px;
-	margin-bottom: 16px;
-	background-color: #f8f9fa;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-	}
-	
-	.vote-info {
-	font-weight: 600;
-	color: #1c1c1c;
-	}
-	
-	.vote-actions {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 4px;
-	}
-	
-	.vote-count {
-	font-size: 14px;
-	color: #6c757d;
-	}
-	
-	.vote-button, .reason-button {
-	background: none;
-	border: none;
-	font-size: 20px;
-	cursor: pointer;
-	margin-left: 8px;
-	}
-	
-	.vote-button:hover {
-	color: #3b5bdb;
-	}
-	
-	.reason-button {
-	color: #6c757d;
-	}
-	
-	.reason-button:hover {
-	color: #4c6ef5;
-	}
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      background-color: #f8f9fa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .vote-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .vote-info {
+      font-weight: 600;
+      color: #1c1c1c;
+    }
+    .vote-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .vote-count {
+      font-size: 14px;
+      color: #6c757d;
+    }
+    .vote-button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .vote-button:hover {
+      color: #3b5bdb;
+    }
+    .reason-button {
+      background: none;
+      border: none;
+      font-size: 16px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 4px;
+      color: #6c757d;
+      cursor: pointer;
+    }
+    .reason-button:hover {
+      color: #4c6ef5;
+    }
     #tooltip {
       position: fixed;
       top: 50%;
@@ -122,6 +130,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="ranking-container">
@@ -146,138 +155,136 @@
     </div>
   </div>
 
-  <script>
-    const voteList = document.getElementById('voteList');
-    const form = document.getElementById('submissionForm');
-
-    async function fetchNames() {
-      try {
-        const response = await fetch('/names');
-        const names = await response.json();
-        renderVotes(names);
-      } catch (error) {
-        console.error('이름 가져오기 오류:', error);
-      }
-    }
-
-    function renderVotes(votes) {
-	voteList.innerHTML = '';
-	votes.sort((a, b) => b.vote_count - a.vote_count);
-	
-	votes.forEach((item, index) => {
-		const div = document.createElement('div');
-		div.className = 'vote-item';
-		div.innerHTML = `
-		<div style="display: flex; align-items: center; gap: 8px;">
-			${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
-			<div class="vote-info">${index + 1}등 - ${item.suggested_name}</div>
-			<button class="reason-button" onclick="showTooltip('${item.suggested_name}', '${item.reason || '사유 없음'}')">💬</button>
-		</div>
-		<div class="vote-actions">
-			<div class="vote-count">(${item.vote_count}표)</div>
-			<button class="vote-button" onclick="vote('${item.suggested_name}')">👍</button>
-		</div>
+	<script>
+		const voteList = document.getElementById('voteList');
+		const form = document.getElementById('submissionForm');
+		
+		async function fetchNames() {
+		try {
+			const response = await fetch('/names');
+			const names = await response.json();
+			renderVotes(names);
+		} catch (error) {
+			console.error('이름 가져오기 오류:', error);
+		}
+		}
+		
+		function renderVotes(votes) {
+		voteList.innerHTML = '';
+		votes.sort((a, b) => b.vote_count - a.vote_count);
+		
+		votes.forEach((item, index) => {
+			const div = document.createElement('div');
+			div.className = 'vote-item';
+			div.innerHTML = `
+			<div class="vote-left">
+				${index === 0 ? '🏆' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
+				<div class="vote-info">${index + 1}등 - ${item.suggested_name}</div>
+				<button class="reason-button" onclick="showTooltip('${item.suggested_name}', '${item.reason || '사유 없음'}')">💬</button>
+			</div>
+			<div class="vote-actions">
+				<div class="vote-count">(${item.vote_count}표)</div>
+				<button class="vote-button" onclick="vote('${item.suggested_name}')">👍</button>
+			</div>
+			`;
+			voteList.appendChild(div);
+		});
+		}
+		
+		async function vote(suggestedName) {
+		const name = prompt('이름을 입력하세요.');
+		if (!name) {
+			alert('이름을 입력해야 투표할 수 있습니다.');
+			return;
+		}
+		
+		try {
+			const response = await fetch('/vote', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ name, suggestedName })
+			});
+		
+			if (response.ok) {
+			alert('투표 완료!');
+			fetchNames();
+			} else {
+			const msg = await response.text();
+			alert(msg || '투표 실패');
+			}
+		} catch (error) {
+			console.error('투표 오류:', error);
+		}
+		}
+		
+		form.addEventListener('submit', async function(event) {
+		event.preventDefault();
+		const name = document.getElementById('name').value.trim();
+		const suggestedName = document.getElementById('suggestedName').value.trim();
+		const reason = document.getElementById('reason').value.trim();
+		
+		if (!name || !suggestedName || !reason) {
+			alert('모든 항목을 입력해주세요.');
+			return;
+		}
+		
+		try {
+			const response = await fetch('/submit', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ name, suggestedName, reason })
+			});
+		
+			if (response.ok) {
+			alert('제출 완료!');
+			form.reset();
+			fetchNames();
+			} else {
+			const msg = await response.text();
+			alert(msg || '제출 실패');
+			}
+		} catch (error) {
+			console.error('제출 오류:', error);
+		}
+		});
+		
+		function showTooltip(name, reason) {
+		let tooltip = document.getElementById('tooltip');
+		if (!tooltip) {
+			tooltip = document.createElement('div');
+			tooltip.id = 'tooltip';
+			document.body.appendChild(tooltip);
+		}
+		tooltip.innerHTML = `
+			<div style="position: relative;">
+			<button onclick="hideTooltip()" style="
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				background: none;
+				border: none;
+				font-size: 20px;
+				cursor: pointer;
+				color: #ff4d4f;
+			">❌</button>
+			<div style="padding: 40px 20px 20px 20px; text-align: left;">
+				<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">SW 이름</div>
+				<div style="margin-bottom: 12px;">${name}</div>
+				<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">사유</div>
+				<div>${reason}</div>
+			</div>
+			</div>
 		`;
-		voteList.appendChild(div);
-	});
-	}
-
-
-    async function vote(suggestedName) {
-      const name = prompt('이름을 입력하세요.');
-      if (!name) {
-        alert('이름을 입력해야 투표할 수 있습니다.');
-        return;
-      }
-
-      try {
-        const response = await fetch('/vote', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, suggestedName })
-        });
-
-        if (response.ok) {
-          alert('투표 완료!');
-          fetchNames();
-        } else {
-          const msg = await response.text();
-          alert(msg || '투표 실패');
-        }
-      } catch (error) {
-        console.error('투표 오류:', error);
-      }
-    }
-
-    form.addEventListener('submit', async function(event) {
-      event.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const suggestedName = document.getElementById('suggestedName').value.trim();
-      const reason = document.getElementById('reason').value.trim();
-
-      if (!name || !suggestedName || !reason) {
-        alert('모든 항목을 입력해주세요.');
-        return;
-      }
-
-      try {
-        const response = await fetch('/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, suggestedName, reason })
-        });
-
-        if (response.ok) {
-          alert('제출 완료!');
-          form.reset();
-          fetchNames();
-        } else {
-          const msg = await response.text();
-          alert(msg || '제출 실패');
-        }
-      } catch (error) {
-        console.error('제출 오류:', error);
-      }
-    });
-
-   function showTooltip(name, reason) {
-	let tooltip = document.getElementById('tooltip');
-	if (!tooltip) {
-		tooltip = document.createElement('div');
-		tooltip.id = 'tooltip';
-		document.body.appendChild(tooltip);
-	}
-	tooltip.innerHTML = `
-		<div style="position: relative;">
-		<button onclick="hideTooltip()" style="
-			position: absolute;
-			top: 10px;
-			right: 10px;
-			background: none;
-			border: none;
-			font-size: 20px;
-			cursor: pointer;
-			color: #ff4d4f;
-		">❌</button>
-		<div style="padding: 40px 20px 20px 20px; text-align: left;">
-			<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">SW 이름</div>
-			<div style="margin-bottom: 12px;">${name}</div>
-			<div style="font-weight: bold; color: #4c6ef5; margin-bottom: 6px;">사유</div>
-			<div>${reason}</div>
-		</div>
-		</div>
-	`;
-	tooltip.style.display = 'block';
-	}
-
-
-    function hideTooltip() {
-      const tooltip = document.getElementById('tooltip');
-      if (tooltip) tooltip.remove();
-    }
-
-    fetchNames();
-    setInterval(fetchNames, 10000);
-  </script>
+		tooltip.style.display = 'block';
+		}
+		
+		function hideTooltip() {
+		const tooltip = document.getElementById('tooltip');
+		if (tooltip) tooltip.remove();
+		}
+		
+		fetchNames();
+		setInterval(fetchNames, 10000);
+	</script>
 </body>
 </html>
