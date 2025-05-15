@@ -260,41 +260,46 @@
 
 	
 	function addTooltipEvents() {
-    const swNames = document.querySelectorAll('.sw-name');
+    const voteItems = document.querySelectorAll('.vote-item');
 
-    swNames.forEach(sw => {
-        sw.addEventListener('mouseenter', function (e) {
-            const reason = e.target.getAttribute('data-reason');
+    voteItems.forEach(item => {
+        const reason = item.querySelector('.sw-name')?.getAttribute('data-reason') || '사유 없음';
+
+        item.addEventListener('mouseenter', function (e) {
             showTooltip(reason, e.pageX, e.pageY);
+            applyBlur();
         });
-        sw.addEventListener('mouseleave', function () {
+        item.addEventListener('mouseleave', function () {
             hideTooltip();
+            removeBlur();
         });
     });
 	}
+
 	
 	function showTooltip(text, x, y) {
-		let tooltip = document.getElementById('tooltip');
-		if (!tooltip) {
-			tooltip = document.createElement('div');
-			tooltip.id = 'tooltip';
-			tooltip.style.position = 'absolute';
-			tooltip.style.background = '#333';
-			tooltip.style.color = 'white';
-			tooltip.style.padding = '8px 12px';
-			tooltip.style.borderRadius = '8px';
-			tooltip.style.fontSize = '14px';
-			tooltip.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-			tooltip.style.transition = 'opacity 0.3s ease';
-			tooltip.style.pointerEvents = 'none';
-			tooltip.style.opacity = '0';
-			document.body.appendChild(tooltip);
-		}
-	
-		tooltip.textContent = text;
-		tooltip.style.left = (x + 10) + 'px';
-		tooltip.style.top = (y + 10) + 'px';
-		tooltip.style.opacity = '1';
+    let tooltip = document.getElementById('tooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'tooltip';
+        tooltip.style.position = 'absolute';
+        tooltip.style.background = '#333';
+        tooltip.style.color = 'white';
+        tooltip.style.padding = '8px 12px';
+        tooltip.style.borderRadius = '8px';
+        tooltip.style.fontSize = '14px';
+        tooltip.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        tooltip.style.transition = 'opacity 0.3s ease';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.opacity = '0';
+        tooltip.style.zIndex = '1000';
+        document.body.appendChild(tooltip);
+    }
+
+    tooltip.textContent = text;
+    tooltip.style.left = (x + 10) + 'px';
+    tooltip.style.top = (y + 10) + 'px';
+    tooltip.style.opacity = '1';
 	}
 	
 	function hideTooltip() {
@@ -308,6 +313,7 @@
 			}, 300);
 		}
 	}
+
 
 	
 	// 팝업 표시
@@ -341,6 +347,33 @@
 			}, 500);
 		}, 2000);
 	}
+	
+	function applyBlur() {
+    let blurOverlay = document.getElementById('blur-overlay');
+    if (!blurOverlay) {
+        blurOverlay = document.createElement('div');
+        blurOverlay.id = 'blur-overlay';
+        blurOverlay.style.position = 'fixed';
+        blurOverlay.style.top = '0';
+        blurOverlay.style.left = '0';
+        blurOverlay.style.width = '100%';
+        blurOverlay.style.height = '100%';
+        blurOverlay.style.background = 'rgba(255, 255, 255, 0.6)';
+        blurOverlay.style.backdropFilter = 'blur(4px)';
+        blurOverlay.style.zIndex = '999'; // vote-item보다 아래에 깔릴 정도로
+        blurOverlay.style.pointerEvents = 'none'; // 클릭 방해 안 하게
+        document.body.appendChild(blurOverlay);
+    }
+    blurOverlay.style.display = 'block';
+	}
+	
+	function removeBlur() {
+		const blurOverlay = document.getElementById('blur-overlay');
+		if (blurOverlay) {
+			blurOverlay.style.display = 'none';
+		}
+	}
+
 	
 	// 페이지 처음 로딩할 때
 	fetchNames();
