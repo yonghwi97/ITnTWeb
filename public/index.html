@@ -438,12 +438,16 @@ function showTooltip(name, reason) {
 
   const reasonWithBreaks = insertLineBreaks(reason, 30);
 
-  const escapedReason = reasonWithBreaks
+  // <br> 먼저 임시로 대체
+  const tempBrPlaceholder = '[[BR]]';
+  let escapedReason = reasonWithBreaks
+    .replace(/<br\s*\/?>/gi, tempBrPlaceholder) // <br>를 임시로 치환
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/'/g, "&#039;")
+    .replace(new RegExp(tempBrPlaceholder, 'g'), '<br>'); // 마지막에 [[BR]] 다시 <br>로 복구
 
   box.innerHTML = `
     <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
@@ -454,6 +458,7 @@ function showTooltip(name, reason) {
 
   overlay.style.display = 'flex';
 }
+
 
 
 
