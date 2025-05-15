@@ -53,21 +53,42 @@ app.get('/names', async (req, res) => {
 app.post('/vote', async (req, res) => {
   const { name, suggestedName } = req.body;
   try {
+    // 1. 이름으로 employees 테이블 조회
+    const employeeResult = await pool.query('SELECT has_voted FROM employees WHERE name = $1', [name]);
+
+    if (employeeResult.rows.length === 0) {
+      return res.status(400).send('존재하지 않는 이름입니다.');
+    }
+
+    if (employeeResult.rows[0].has_voted) {
+      return res.status(400).send('투표는 한 번만 하실 수 있습니다.');
+    }
+
+    // 2. submissions 테이블에서 SW 이름 찾기
     const user = await pool.query('SELECT * FROM submissions WHERE suggested_name = $1', [suggestedName]);
     if (user.rows.length === 0) {
       return res.status(404).send('해당 이름이 존재하지 않습니다.');
     }
 
+    // 3. 투표 수 증가
     await pool.query(
       'UPDATE submissions SET vote_count = vote_count + 1 WHERE suggested_name = $1',
       [suggestedName]
     );
+
+    // 4. employees 테이블 has_voted 업데이트
+    await pool.query(
+      'UPDATE employees SET has_voted = TRUE WHERE name = $1',
+      [name]
+    );
+
     res.send('투표 완료!');
   } catch (err) {
     console.error('투표 오류:', err);
     res.status(500).send('서버 오류');
   }
 });
+
 
 // 메인 페이지
 app.get('/', (req, res) => {
