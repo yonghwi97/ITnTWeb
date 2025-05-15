@@ -96,7 +96,7 @@
    .reason-button {
 	background: none;
 	border: none;
-	font-size: 16px; /* 조금 줄였음 */
+	font-size: 16px; 
 	padding: 0;
 	margin: 0;
 	vertical-align: middle;
@@ -179,16 +179,18 @@
         const div = document.createElement('div');
         div.className = 'vote-item';
         div.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            ${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
-            <div style="display: flex; align-items: center; gap: 6px;">
+          <div class="vote-item">
+			<div style="display: flex; align-items: center; gap: 6px;">
+				${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
 				<div class="vote-info">${index + 1}등 - ${item.suggested_name}</div>
 				<button class="reason-button" onclick="showTooltip('${item.suggested_name}', '${item.reason || '사유 없음'}')">💬</button>
 			</div>
-          <div class="vote-actions">
-            <div class="vote-count">(${item.vote_count}표)</div>
-            <button class="vote-button" onclick="vote('${item.suggested_name}')">👍</button>
-          </div>
+			<div class="vote-actions" style="display: flex; flex-direction: column; align-items: center;">
+				<div class="vote-count">(${item.vote_count}표)</div>
+				<button class="vote-button" onclick="vote('${item.suggested_name}')">👍</button>
+			</div>
+		   </div>
+
         `;
         voteList.appendChild(div);
       });
