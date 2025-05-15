@@ -427,31 +427,27 @@ form.addEventListener('submit', async function(event) {
 function insertLineBreaks(text, maxLength) {
   let result = '';
   for (let i = 0; i < text.length; i += maxLength) {
-    result += text.slice(i, i + maxLength) + '<br>';
+    result += text.slice(i, i + maxLength) + '\n';
   }
   return result;
 }
+
 
 function showTooltip(name, reason) {
   const overlay = document.getElementById('tooltipOverlay');
   const box = document.getElementById('tooltipBox');
 
-  // 1. 30글자마다 개행 (실제 데이터는 <br> 없음)
+  // 1. 먼저 30글자마다 줄바꿈 넣기
   let reasonWithBreaks = insertLineBreaks(reason, 30);
 
-  // 2. 엔터(\n) 또는 <br>을 <br> 태그로 변환
-  reasonWithBreaks = reasonWithBreaks.replace(/\n/g, "<br>");
-
-  // 3. HTML 이스케이프 (단, <br>만 예외로)
+  // 2. HTML에서 문제되는 특수문자만 escape (따옴표는 escape 안 함)
   let escapedReason = reasonWithBreaks
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/>/g, "&gt;");
 
-  // 4. 다시 <br> 살리기
-  escapedReason = escapedReason.replace(/&lt;br&gt;/g, "<br>");
+  // 3. 줄바꿈(\n)을 <br>로 변환
+  escapedReason = escapedReason.replace(/\n/g, "<br>");
 
   box.innerHTML = `
     <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
@@ -462,6 +458,7 @@ function showTooltip(name, reason) {
 
   overlay.style.display = 'flex';
 }
+
 
 
 
