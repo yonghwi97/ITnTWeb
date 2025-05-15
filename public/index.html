@@ -227,11 +227,6 @@ function renderVotes(votes) {
 
 async function vote(suggestedName) {
   openModal(async (name) => {
-    if (!name) {
-      alertModal('이름을 입력해야 투표할 수 있습니다.');
-      return;
-    }
-
     try {
       const response = await fetch('/vote', {
         method: 'POST',
@@ -254,6 +249,7 @@ async function vote(suggestedName) {
 }
 
 
+
 function openModal(callback) {
   modalCallback = callback;
   document.getElementById('modalOverlay').style.display = 'flex';
@@ -274,9 +270,15 @@ function alertModal(message) {
 
 function submitModal() {
   const name = document.getElementById('modalInput').value.trim();
+  if (!name) {
+    closeModal(); // 먼저 입력창 닫아주고
+    alertModal('이름을 입력해야 투표할 수 있습니다.'); // 경고창 띄우기
+    return;
+  }
   if (modalCallback) modalCallback(name);
   closeModal();
 }
+
 
 function closeModal() {
   document.getElementById('modalOverlay').style.display = 'none';
@@ -324,7 +326,7 @@ function showTooltip(name, reason) {
       <div>${reason}</div>
     </div>
   `;
-  tooltip.style.display = 'flex'; // ★중요★ flex로!
+  tooltip.style.display = 'flex';
 }
 
 
@@ -346,10 +348,14 @@ function outsideClickListener(e) {
 
 document.addEventListener('click', function(e) {
   const tooltip = document.getElementById('tooltip');
-  if (tooltip.style.display === 'flex' && !document.getElementById('tooltipBox').contains(e.target)) {
-    hideTooltip();
+  if (tooltip && tooltip.style.display === 'flex') {
+    const tooltipBox = document.getElementById('tooltipBox');
+    if (!tooltipBox.contains(e.target)) {
+      hideTooltip();
+    }
   }
 });
+
 
 fetchNames();
 setInterval(fetchNames, 10000);
