@@ -5,24 +5,40 @@
     <title>SV3 SW 이름 공모전</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f2f2f2;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background-color: #f2f2f2;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 30px;
+            gap: 30px;
         }
         .form-container, .ranking-container {
             background: white;
-            padding: 20px;
+            padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            width: 500px;
+        }
+        .form-container {
+            min-width: 500px;
+        }
+        .ranking-container {
+            min-width: 400px;
         }
         h1, h2 {
             text-align: center;
+            margin-bottom: 24px;
             color: #333;
         }
         label {
             font-weight: bold;
+            display: block;
+            margin-top: 10px;
         }
         input, textarea {
             width: 100%;
@@ -57,6 +73,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             transition: transform 0.2s ease;
             background-color: #f8f9fa;
+            cursor: pointer;
         }
         .vote-item:hover {
             transform: scale(1.02);
@@ -78,25 +95,27 @@
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>SV3 SW 이름 공모전</h1>
-        <form id="submissionForm">
-            <label for="name">이름</label>
-            <input type="text" id="name" name="name" required>
+    <div class="container">
+        <div class="ranking-container">
+            <h2>투표 순위</h2>
+            <div id="voteList"></div>
+        </div>
 
-            <label for="suggestedName">SW 이름</label>
-            <input type="text" id="suggestedName" name="suggestedName" required>
+        <div class="form-container">
+            <h1>SV3 SW 이름 공모전</h1>
+            <form id="submissionForm">
+                <label for="name">이름</label>
+                <input type="text" id="name" name="name" required>
 
-            <label for="reason">사유</label>
-            <textarea id="reason" name="reason" rows="4" required></textarea>
+                <label for="suggestedName">SW 이름</label>
+                <input type="text" id="suggestedName" name="suggestedName" required>
 
-            <button type="submit">제출하기</button>
-        </form>
-    </div>
+                <label for="reason">사유</label>
+                <textarea id="reason" name="reason" rows="4" required></textarea>
 
-    <div class="ranking-container">
-        <h2>투표 순위</h2>
-        <div id="voteList"></div>
+                <button type="submit">제출하기</button>
+            </form>
+        </div>
     </div>
 
     <script>
