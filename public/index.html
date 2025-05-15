@@ -436,24 +436,25 @@ function showTooltip(name, reason) {
   const overlay = document.getElementById('tooltipOverlay');
   const box = document.getElementById('tooltipBox');
 
-  const escapedReason = reason
+  const reasonWithBreaks = insertLineBreaks(reason, 30);
+
+  const escapedReason = reasonWithBreaks
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-  const formattedReason = insertLineBreaks(escapedReason, 30); // <-- 30글자마다 개행
-
   box.innerHTML = `
     <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
     <div style="margin-bottom: 20px;">${name}</div>
     <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">설명</div>
-    <div style="word-break: break-word; white-space: normal;">${formattedReason}</div>
+    <div style="word-break: break-word; white-space: normal;">${escapedReason}</div>
   `;
-  
+
   overlay.style.display = 'flex';
 }
+
 
 
 
