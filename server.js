@@ -53,33 +53,53 @@ app.get('/names', async (req, res) => {
 app.post('/vote', async (req, res) => {
   const { name, suggestedName } = req.body;
   try {
-    // 이름 확인
-    const user = await pool.query('SELECT * FROM employees WHERE name = $1', [name]);
-    if (user.rows.length === 0) {
-      return res.status(404).send('등록되지 않은 이름입니다.');
-    }
-
-    const votedCount = user.rows[0].has_voted || 0;
-    if (votedCount >= 10) {
-      return res.status(400).send('더 이상 투표할 수 없습니다.');
-    }
-
-    // 본인이 제출한 SW 이름인지 확인
-    const submission = await pool.query('SELECT * FROM submissions WHERE suggested_name = $1', [suggestedName]);
-    if (submission.rows.length > 0 && submission.rows[0].name === name) {
-      return res.status(400).send('본인이 제출한 SW 이름에는 투표할 수 없습니다.');
-    }
-
-    // 투표 집계
-    await pool.query(
-      'UPDATE submissions SET vote_count = vote_count + 1 WHERE suggested_name = $1',
+    // 1. 제출자 본인인지 검사
+    const swOwner = await pool.query(
+      'SELECT submitter FROM sw_name WHERE sw_name = $1',
       [suggestedName]
     );
 
-    // 사용자 투표 횟수 +1
+    if (swOwner.rows.length > 0 && swOwner.rows[0].submitter === name) {
+      return res.status(400).send('본인의 아이디어에는 투표할 수 없습니다.');
+    }
+
+    // 2. 투표자 정보 가져오기
+    const employee = await pool.query('SELECT * FROM employees WHERE name = $1', [name]);
+    if (employee.rows.length === 0) {
+      return res.status(400).send('등록되지 않은 이름입니다.');
+    }
+
+    const user = employee.rows[0];
+
+    // 3. 투표 횟수 확인
+    if (user.has_voted >= 10) {
+      return res.status(400).send('투표는 최대 10번까지만 가능합니다.');
+    }
+
+    // 4. 빈 vote 칸 찾기
+    let voteColumn = null;
+    for (let i = 1; i <= 10; i++) {
+      if (!user[`vote${i}`]) {
+        voteColumn = `vote${i}`;
+        break;
+      }
+    }
+
+    if (!voteColumn) {
+      return res.status(400).send('이미 10번 투표를 완료했습니다.');
+    }
+
+    // 5. 투표 반영
     await pool.query(
-      'UPDATE employees SET has_voted = has_voted + 1 WHERE name = $1',
-      [name]
+      `UPDATE employees
+       SET ${voteColumn} = $1, has_voted = has_voted + 1
+       WHERE name = $2`,
+      [suggestedName, name]
+    );
+
+    await pool.query(
+      'UPDATE submissions SET vote_count = vote_count + 1 WHERE suggested_name = $1',
+      [suggestedName]
     );
 
     res.send('투표 완료!');
@@ -88,6 +108,7 @@ app.post('/vote', async (req, res) => {
     res.status(500).send('서버 오류');
   }
 });
+
 
 
 

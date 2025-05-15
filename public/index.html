@@ -176,10 +176,41 @@
     #modal button:hover {
       background-color: #3b5bdb;
     }
+	
+	.notice-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	}
+	
+	.notice-list li {
+	margin-bottom: 18px;
+	font-size: 16px;
+	color: #444;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	}
+	
+	.notice-list li span {
+	font-size: 22px;
+	}
+	
+	.notice-list li b {
+	color: #4c6ef5; /* 포인트 컬러 */
+	}
   </style>
 </head>
 <body>
   <div class="container">
+	<div class="form-container">
+		<h1>⚠️ 주의사항</h1>
+		<ul class="notice-list">
+		<li><span>🧮</span> 1인당 <b>투표권은 10개</b>로 제한합니다.</li>
+		<li><span>💡</span> 1인이 낼 수 있는 아이디어의 개수는 <b>제한이 없습니다.</b></li>
+		<li><span>🚫</span> 본인의 아이디어에는 <b>투표할 수 없습니다.</b></li>
+		</ul>
+	</div>
     <div class="ranking-container">
       <h1>SV3 SW 플랫폼 이름 공모</h1>
       <h2>투표 목록</h2>
