@@ -315,22 +315,59 @@ form.addEventListener('submit', async function(event) {
 });
 
 function showTooltip(name, reason) {
-  const tooltip = document.getElementById('tooltip');
+  let tooltip = document.getElementById('tooltip');
+  if (!tooltip) {
+    tooltip = document.createElement('div');
+    tooltip.id = 'tooltip';
+    document.body.appendChild(tooltip);
+  }
+
   tooltip.innerHTML = `
-    <div id="tooltipBox">
+    <div style="
+      position: relative;
+      width: 320px;
+      min-height: 180px;
+      padding: 30px 25px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+      border: 1px solid #ccc;
+      text-align: left;
+    ">
       <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
       <div style="margin-bottom: 20px;">${name}</div>
       <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">사유</div>
       <div>${reason}</div>
     </div>
   `;
-  tooltip.style.display = 'flex';
+
+  tooltip.style.position = 'fixed';
+  tooltip.style.top = '50%';
+  tooltip.style.left = '50%';
+  tooltip.style.transform = 'translate(-50%, -50%)';
+  tooltip.style.zIndex = '2000';
+  tooltip.style.display = 'block';
+
+  // 바깥쪽 클릭시 툴팁 닫기
+  setTimeout(() => {
+    document.addEventListener('click', outsideClickListener);
+  }, 0);
 }
 
 function hideTooltip() {
   const tooltip = document.getElementById('tooltip');
-  if (tooltip) tooltip.style.display = 'none';
+  if (tooltip) tooltip.remove();
+  document.removeEventListener('click', outsideClickListener);
 }
+
+function outsideClickListener(e) {
+  const tooltip = document.getElementById('tooltip');
+  if (tooltip && !tooltip.contains(e.target)) {
+    hideTooltip();
+  }
+}
+
 
 document.addEventListener('click', function(e) {
   const tooltip = document.getElementById('tooltip');
