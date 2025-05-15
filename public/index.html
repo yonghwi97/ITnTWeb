@@ -241,8 +241,7 @@
   background: rgba(0,0,0,0.5);
   z-index: 2000;
   justify-content: center;
-  align-items: center;
-">
+  align-items: center;">
   <div id="tooltipBox">
   </div>
 </div>
@@ -433,10 +432,11 @@ function showTooltip(name, reason) {
     <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">SW 이름</div>
     <div style="margin-bottom: 20px;">${name}</div>
     <div style="font-weight: bold; color: #4c6ef5; margin-bottom: 10px;">설명</div>
-    <div>${reason}</div>
+    <div style="word-break: break-word; white-space: normal;">${reason}</div>
   `;
   overlay.style.display = 'flex';
 }
+
 
 document.getElementById('tooltipOverlay').addEventListener('click', function(e) {
   if (e.target.id === 'tooltipOverlay') {
