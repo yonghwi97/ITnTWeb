@@ -4,403 +4,279 @@
     <meta charset="UTF-8">
     <title>SV3 SW 이름 공모전</title>
     <style>
-		body {
-			font-family: 'Noto Sans KR', sans-serif;
-			background-color: #eef1f5;
-			display: flex;
-			justify-content: center;
-			align-items: flex-start;
-			gap: 40px;
-			padding: 50px;
-			margin: 0;
-		}
-		.form-container, .vote-container {
-			background: white;
-			padding: 30px 40px;
-			border-radius: 16px;
-			box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-			width: 420px;
-		}
-		h1 {
-			text-align: center;
-			color: #222;
-			font-size: 24px;
-			margin-bottom: 20px;
-		}
-		label {
-			display: block;
-			margin-bottom: 6px;
-			font-weight: bold;
-			color: #555;
-			margin-top: 10px;
-		}
-		input, textarea {
-			width: 100%;
-			padding: 12px;
-			margin-bottom: 18px;
-			border: 1px solid #ddd;
-			border-radius: 8px;
-			font-size: 15px;
-			box-sizing: border-box;
-			background-color: #fafafa;
-		}
-		.submit-btn {
-			width: 100%;
-			padding: 14px;
-			background-color: #5c7cfa;
-			color: white;
-			border: none;
-			border-radius: 8px;
-			font-size: 16px;
-			font-weight: bold;
-			transition: background-color 0.3s ease;
-			margin-top: 10px;
-		}
-		.submit-btn:hover {
-			background-color: #4c6ef5;
-		}		
-		.vote-item {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 14px 20px;
-			border-radius: 12px;
-			margin-bottom: 12px;
-			font-size: 16px;
-			box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-			transition: transform 0.2s ease;
-		}
-		.vote-item:hover {
-			transform: scale(1.02);
-		}
-		.vote-info {
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			font-weight: 600;
-			color: #1c1c1c;
-		}
-		.vote-rank {
-			font-weight: bold;
-			font-size: 18px;
-		}
-		.vote-button {
-			background: none;
-			border: none;
-			font-size: 28px;
-			color: #5c7cfa;
-			cursor: pointer;
-		}
-		.vote-button:hover {
-			color: #4c6ef5;
-		}
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+        .form-container, .ranking-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .vote-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
+            background-color: #f8f9fa;
+        }
+        .vote-item:hover {
+            transform: scale(1.02);
+        }
+        .vote-info {
+            font-weight: 600;
+            color: #1c1c1c;
+        }
+        .vote-button {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #5c7cfa;
+            cursor: pointer;
+        }
+        .vote-button:hover {
+            color: #4c6ef5;
+        }
     </style>
 </head>
 <body>
-
-    <div class="vote-container">
-        <h1>투표 목록</h1>
-        <div id="voteList">
-            <!-- SW 이름과 투표 버튼이 추가될 부분 -->
-        </div>
-    </div>
-
     <div class="form-container">
-        <h1>이름 공모</h1>
-		<form id="submissionForm">
-			<label for="name">이름</label>
-			<input type="text" id="name" name="name" required>
-		
-			<label for="suggestedName">SW 이름</label>
-			<input type="text" id="suggestedName" name="suggestedName" required>
-		
-			<label for="reason">사유</label>
-			<textarea id="reason" name="reason" rows="4" required></textarea>
-		
-			<button class="submit-btn" type="submit">제출하기</button>
-		</form>
+        <h1>SV3 SW 이름 공모전</h1>
+        <form id="submissionForm">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="suggestedName">SW 이름</label>
+            <input type="text" id="suggestedName" name="suggestedName" required>
+
+            <label for="reason">사유</label>
+            <textarea id="reason" name="reason" rows="4" required></textarea>
+
+            <button type="submit">제출하기</button>
+        </form>
     </div>
 
+    <div class="ranking-container">
+        <h2>투표 순위</h2>
+        <div id="voteList"></div>
+    </div>
 
-	<script>
-	let votes = [];  // 전역 votes 배열 추가
-	
-	const form = document.getElementById('submissionForm');
-	const voteList = document.getElementById('voteList');
-	
-	form.addEventListener('submit', async function(event) {
-    event.preventDefault();
+    <script>
+        const voteList = document.getElementById('voteList');
+        const form = document.getElementById('submissionForm');
 
-    const name = document.getElementById('name').value.trim();
-    const suggestedName = document.getElementById('suggestedName').value.trim();
-    const reason = document.getElementById('reason').value.trim();
+        async function fetchNames() {
+            try {
+                const response = await fetch('/names');
+                const names = await response.json();
+                renderVotes(names);
+            } catch (error) {
+                console.error('이름 가져오기 오류:', error);
+            }
+        }
 
-    const data = { name, suggestedName, reason };
+        function renderVotes(votes) {
+            voteList.innerHTML = '';
+            votes.sort((a, b) => b.vote_count - a.vote_count);
 
-    // 제출 전에 중복 체크
-    const existingNames = votes.map(v => v.suggested_name.toLowerCase());
-    if (existingNames.includes(suggestedName.toLowerCase())) {
-        showPopup('❗️ 이미 등록된 SW 이름입니다.');
-        return;
-    }
+            votes.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'vote-item';
+                div.innerHTML = `
+                    <div class="vote-info">
+                        ${index === 0 ? '🏆 ' : index === 1 ? '🥈 ' : index === 2 ? '🥉 ' : ''}
+                        ${index + 1}등 - ${item.suggested_name} (${item.vote_count}표)
+                    </div>
+                    <button class="vote-button" onclick="vote('${item.suggested_name}')">👍</button>
+                `;
+                div.setAttribute('data-reason', item.reason || '사유 없음');
+                div.addEventListener('mouseenter', () => {
+                    showTooltip(div.getAttribute('data-reason'));
+                    applyBlur();
+                });
+                div.addEventListener('mouseleave', () => {
+                    hideTooltip();
+                    removeBlur();
+                });
+                voteList.appendChild(div);
+            });
+        }
 
-    try {
-        const response = await fetch('/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+        async function vote(suggestedName) {
+            const name = prompt('당신의 이름을 입력하세요.');
+            if (!name) {
+                alert('이름을 입력해야 투표할 수 있습니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/vote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, suggestedName })
+                });
+
+                if (response.ok) {
+                    alert('투표 완료!');
+                    fetchNames();
+                } else {
+                    const msg = await response.text();
+                    alert(msg || '투표 실패');
+                }
+            } catch (error) {
+                console.error('투표 오류:', error);
+            }
+        }
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const suggestedName = document.getElementById('suggestedName').value.trim();
+            const reason = document.getElementById('reason').value.trim();
+
+            if (!name || !suggestedName || !reason) {
+                alert('모든 항목을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, suggestedName, reason })
+                });
+
+                if (response.ok) {
+                    alert('제출 완료!');
+                    form.reset();
+                    fetchNames();
+                } else {
+                    const msg = await response.text();
+                    alert(msg || '제출 실패');
+                }
+            } catch (error) {
+                console.error('제출 오류:', error);
+            }
         });
 
-        if (response.ok) {
-            showPopup('제출 완료! 감사합니다!');
-            form.reset();
-            await fetchNames();
-        } else {
-            showPopup('❗️ 제출 실패. 다시 시도하세요.');
-        }
-    } catch (error) {
-        console.error('에러:', error);
-        showPopup('❗️ 서버 오류 발생');
-    }
-	});
+        function showTooltip(text) {
+            let tooltip = document.getElementById('tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'tooltip';
+                tooltip.style.position = 'fixed';
+                tooltip.style.top = '50%';
+                tooltip.style.left = '50%';
+                tooltip.style.transform = 'translate(-50%, -50%)';
+                tooltip.style.minWidth = '300px';
+                tooltip.style.background = 'rgba(50, 50, 50, 0.9)';
+                tooltip.style.color = 'white';
+                tooltip.style.padding = '20px 30px';
+                tooltip.style.borderRadius = '12px';
+                tooltip.style.fontSize = '18px';
+                tooltip.style.fontWeight = '500';
+                tooltip.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
+                tooltip.style.backdropFilter = 'blur(6px)';
+                tooltip.style.transition = 'opacity 0.4s ease';
+                tooltip.style.pointerEvents = 'none';
+                tooltip.style.opacity = '0';
+                tooltip.style.zIndex = '1000';
+                document.body.appendChild(tooltip);
+            }
 
-
-	
-	// 이름 + 투표수 가져오기
-	async function fetchNames() {
-		try {
-			const response = await fetch('/names');
-			const names = await response.json();
-			votes = names;  // 서버에서 받은 데이터를 전역 votes에 저장
-			renderVotes(votes);
-		} catch (error) {
-			console.error('이름 가져오기 에러:', error);
-		}
-	}
-
-	
-	// 투표 버튼 눌렀을 때
-	async function vote(suggestedName) {
-		const userName = prompt('이름을 입력하세요:');
-		if (!userName) {
-			showPopup('❗️ 이름을 입력해야 투표할 수 있습니다.');
-			return;
-		}
-		try {
-			const response = await fetch('/vote', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					userName: userName,
-					suggestedName: suggestedName
-				})
-			});
-			if (response.ok) {
-				showPopup(`${suggestedName}에 투표 완료!`);
-				await fetchNames(); // 목록 새로고침
-			} else {
-				const errorMessage = await response.text();
-				showPopup(errorMessage);
-			}
-		} catch (error) {
-			console.error('투표 에러:', error);
-			showPopup('서버 오류 발생');
-		}
-	}
-
-
-	
-	// 이름 목록 화면에 표시
-	function renderVotes(votes) {
-    voteList.innerHTML = '';
-    votes.sort((a, b) => b.vote_count - a.vote_count);
-
-    votes.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'vote-item';
-
-        const info = document.createElement('div');
-        info.className = 'vote-info';
-
-        let rankBadge = `${index + 1}등`;
-        let backgroundColor = '#f8f9fa'; // 기본
-
-        if (index === 0) {
-            rankBadge = '🏆 1등';
-            backgroundColor = '#FFD700'; // 금색
-        } else if (index === 1) {
-            rankBadge = '🥈 2등';
-            backgroundColor = '#C0C0C0'; // 은색
-        } else if (index === 2) {
-            rankBadge = '🥉 3등';
-            backgroundColor = '#CD7F32'; // 동색
+            tooltip.textContent = text;
+            tooltip.style.opacity = '1';
         }
 
-        info.innerHTML = `
-            <span class="vote-rank">${rankBadge}</span> 
-            <span class="sw-name" data-reason="${item.reason || '사유 없음'}">${item.suggested_name}</span> 
-            (${item.vote_count}표)
-        `;
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tooltip) {
+                        tooltip.remove();
+                    }
+                }, 400);
+            }
+        }
 
-        div.style.backgroundColor = backgroundColor;
-        div.style.color = '#1c1c1c';
+        function applyBlur() {
+            let blurOverlay = document.getElementById('blur-overlay');
+            if (!blurOverlay) {
+                blurOverlay = document.createElement('div');
+                blurOverlay.id = 'blur-overlay';
+                blurOverlay.style.position = 'fixed';
+                blurOverlay.style.top = '0';
+                blurOverlay.style.left = '0';
+                blurOverlay.style.width = '100%';
+                blurOverlay.style.height = '100%';
+                blurOverlay.style.background = 'rgba(255, 255, 255, 0.3)';
+                blurOverlay.style.backdropFilter = 'blur(0px)';
+                blurOverlay.style.transition = 'backdrop-filter 0.4s ease, background 0.4s ease';
+                blurOverlay.style.zIndex = '998';
+                blurOverlay.style.pointerEvents = 'none';
+                document.body.appendChild(blurOverlay);
+            }
 
-        const button = document.createElement('button');
-        button.className = 'vote-button';
-        button.innerHTML = '👍';
-        button.onclick = () => vote(item.suggested_name);
+            setTimeout(() => {
+                blurOverlay.style.backdropFilter = 'blur(6px)';
+                blurOverlay.style.background = 'rgba(255, 255, 255, 0.5)';
+            }, 50);
+        }
 
-        div.appendChild(info);
-        div.appendChild(button);
-        voteList.appendChild(div);
-    });
+        function removeBlur() {
+            const blurOverlay = document.getElementById('blur-overlay');
+            if (blurOverlay) {
+                blurOverlay.style.backdropFilter = 'blur(0px)';
+                blurOverlay.style.background = 'rgba(255, 255, 255, 0.0)';
+                setTimeout(() => {
+                    if (blurOverlay) {
+                        blurOverlay.remove();
+                    }
+                }, 400);
+            }
+        }
 
-		addTooltipEvents(); // ✅ 다시 연결
-	}
-
-	
-	function addTooltipEvents() {
-		const voteItems = document.querySelectorAll('.vote-item');
-	
-		voteItems.forEach(item => {
-			const reason = item.querySelector('.sw-name')?.getAttribute('data-reason') || '사유 없음';
-	
-			item.addEventListener('mouseenter', function () {
-				showTooltip(reason);
-				applyBlur();
-			});
-			item.addEventListener('mouseleave', function () {
-				hideTooltip();
-				removeBlur();
-			});
-		});
-	}
-
-
-	
-	function showTooltip(text) {
-		let tooltip = document.getElementById('tooltip');
-		if (!tooltip) {
-			tooltip = document.createElement('div');
-			tooltip.id = 'tooltip';
-			tooltip.style.position = 'fixed';
-			tooltip.style.top = '50%';
-			tooltip.style.left = '50%';
-			tooltip.style.transform = 'translate(-50%, -50%)';
-			tooltip.style.min-width = '300px';
-			tooltip.style.background = 'rgba(50, 50, 50, 0.9)';
-			tooltip.style.color = 'white';
-			tooltip.style.padding = '20px 30px';
-			tooltip.style.borderRadius = '12px';
-			tooltip.style.fontSize = '18px';
-			tooltip.style.font-weight = '500';
-			tooltip.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.2)';
-			tooltip.style.backdropFilter = 'blur(6px)';
-			tooltip.style.transition = 'opacity 0.4s ease';
-			tooltip.style.pointerEvents = 'none';
-			tooltip.style.opacity = '0';
-			tooltip.style.zIndex = '1000';
-			document.body.appendChild(tooltip);
-		}
-	
-		tooltip.textContent = text;
-		tooltip.style.opacity = '1';
-	}
-	
-	function hideTooltip() {
-		const tooltip = document.getElementById('tooltip');
-		if (tooltip) {
-			tooltip.style.opacity = '0';
-			setTimeout(() => {
-				if (tooltip) {
-					tooltip.remove();
-				}
-			}, 400); // fade out duration과 맞춰서
-		}
-	}
-
-
-
-	
-	// 팝업 표시
-	function showPopup(message) {
-		const popup = document.createElement('div');
-		popup.textContent = message;
-		popup.style.position = 'fixed';
-		popup.style.top = '50%';
-		popup.style.left = '50%';
-		popup.style.transform = 'translate(-50%, -50%)';
-		popup.style.background = '#333';
-		popup.style.color = 'white';
-		popup.style.padding = '20px 40px';
-		popup.style.borderRadius = '12px';
-		popup.style.fontSize = '18px';
-		popup.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
-		popup.style.opacity = '0';
-		popup.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-		document.body.appendChild(popup);
-	
-		setTimeout(() => {
-			popup.style.opacity = '1';
-			popup.style.transform = 'translate(-50%, -50%) scale(1.05)';
-		}, 10);
-	
-		setTimeout(() => {
-			popup.style.opacity = '0';
-			popup.style.transform = 'translate(-50%, -50%) scale(0.9)';
-			setTimeout(() => {
-				popup.remove();
-			}, 500);
-		}, 2000);
-	}
-	
-	function applyBlur() {
-		let blurOverlay = document.getElementById('blur-overlay');
-		if (!blurOverlay) {
-			blurOverlay = document.createElement('div');
-			blurOverlay.id = 'blur-overlay';
-			blurOverlay.style.position = 'fixed';
-			blurOverlay.style.top = '0';
-			blurOverlay.style.left = '0';
-			blurOverlay.style.width = '100%';
-			blurOverlay.style.height = '100%';
-			blurOverlay.style.background = 'rgba(255, 255, 255, 0.3)';
-			blurOverlay.style.backdropFilter = 'blur(0px)';
-			blurOverlay.style.transition = 'backdrop-filter 0.4s ease, background 0.4s ease';
-			blurOverlay.style.zIndex = '998'; // tooltip보다 밑에
-			blurOverlay.style.pointerEvents = 'none';
-			document.body.appendChild(blurOverlay);
-		}
-	
-		// 약간 텀을 두고 자연스럽게 흐림
-		setTimeout(() => {
-			blurOverlay.style.backdropFilter = 'blur(6px)';
-			blurOverlay.style.background = 'rgba(255, 255, 255, 0.5)';
-		}, 50);
-	}
-	
-	function removeBlur() {
-		const blurOverlay = document.getElementById('blur-overlay');
-		if (blurOverlay) {
-			blurOverlay.style.backdropFilter = 'blur(0px)';
-			blurOverlay.style.background = 'rgba(255, 255, 255, 0.0)';
-			setTimeout(() => {
-				if (blurOverlay) {
-					blurOverlay.remove();
-				}
-			}, 400); // 부드럽게 사라진 다음에 삭제
-		}
-	}
-
-
-	
-	// 페이지 처음 로딩할 때
-	fetchNames();
-	
-	// 10초마다 최신 데이터 가져오기
-	setInterval(fetchNames, 10000);
-	</script>
-
-
+        fetchNames();
+        setInterval(fetchNames, 10000);
+    </script>
 </body>
 </html>
