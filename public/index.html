@@ -322,10 +322,10 @@ async function vote(suggestedName) {
 
   const openDate = new Date('2025-05-22T00:00:00+09:00');
 
-  if (koreaTime < openDate) {
-    alertModal('⏰ 아직 투표 가능한 시간이 아닙니다.');
-    return; 
-  }
+//  if (koreaTime < openDate) {
+//    alertModal('⏰ 아직 투표 가능한 시간이 아닙니다.');
+//    return; 
+//  }
 
   // 2. 이후부터는 정상 투표 로직
   openModal(async (name) => {
@@ -467,12 +467,6 @@ function showTooltip(name, reason) {
 
   overlay.style.display = 'flex';
 }
-
-
-
-
-
-
 
 document.getElementById('tooltipOverlay').addEventListener('click', function(e) {
   if (e.target.id === 'tooltipOverlay') {
