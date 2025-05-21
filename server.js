@@ -55,7 +55,7 @@ app.post('/vote', async (req, res) => {
   try {
     // 1. 제출자 본인인지 검사
     const swOwner = await pool.query(
-      'SELECT submitter FROM submissions WHERE suggested_name = $1',
+      'SELECT name FROM submissions WHERE suggested_name = $1',
       [suggestedName]
     );
     
