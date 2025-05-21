@@ -98,7 +98,7 @@ app.post('/vote', async (req, res) => {
     );
 
     await pool.query(
-      'UPDATE submissions SET vote_count = vote_count + 1 WHERE "suggested_name" = $1'
+      'UPDATE submissions SET vote_count = vote_count + 1 WHERE "suggested_name" = $1',
       [suggestedName]
     );
 
