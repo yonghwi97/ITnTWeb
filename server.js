@@ -41,7 +41,7 @@ app.post('/submit', async (req, res) => {
 // SW 이름 목록 조회 API
 app.get('/names', async (req, res) => {
   try {
-    const result = await pool.query('SELECT suggested_name, vote_count, reason FROM submissions');
+    const result = await pool.query('SELECT suggested_name, vote_count, reason FROM employees');
     res.json(result.rows);
   } catch (err) {
     console.error('DB 이름 조회 오류:', err);
