@@ -20,7 +20,7 @@ app.post('/submit', async (req, res) => {
   const { name, suggestedName, reason } = req.body;
   try {
     const existing = await pool.query(
-      'SELECT * FROM submissions WHERE suggested_name = $1',
+      'SELECT * FROM submissions WHERE "suggested_name" = $1',
       [suggestedName]
     );
     if (existing.rows.length > 0) {
@@ -28,7 +28,7 @@ app.post('/submit', async (req, res) => {
     }
 
     await pool.query(
-      'INSERT INTO submissions (name, suggested_name, reason, vote_count) VALUES ($1, $2, $3, 0)',
+      'INSERT INTO submissions (name, "suggested_name", reason, vote_count) VALUES ($1, $2, $3, 0)',
       [name, suggestedName, reason]
     );
     res.send('제출 완료!');
@@ -41,7 +41,7 @@ app.post('/submit', async (req, res) => {
 // SW 이름 목록 조회 API
 app.get('/names', async (req, res) => {
   try {
-    const result = await pool.query('SELECT suggested_name, vote_count, reason FROM employees');
+    const result = await pool.query('SELECT "suggested_name", vote_count, reason FROM employees');
     res.json(result.rows);
   } catch (err) {
     console.error('DB 이름 조회 오류:', err);
