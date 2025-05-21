@@ -55,10 +55,10 @@ app.post('/vote', async (req, res) => {
   try {
     // 1. 제출자 본인인지 검사
     const swOwner = await pool.query(
-      'SELECT name FROM submisstions WHERE sw_name = $1',
+      'SELECT submitter FROM submissions WHERE suggested_name = $1',
       [suggestedName]
     );
-
+    
     if (swOwner.rows.length > 0 && swOwner.rows[0].submitter === name) {
       return res.status(400).send('본인의 아이디어에는 투표할 수 없습니다.');
     }
